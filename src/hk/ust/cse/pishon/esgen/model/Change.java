@@ -52,4 +52,8 @@ public class Change implements Serializable {
 	public EditScript getScript(){
 		return this.script;
 	}
+	
+	public void setScript(EditScript script) {
+		this.script = script;
+	}
 }

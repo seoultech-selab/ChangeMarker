@@ -1,7 +1,7 @@
 package hk.ust.cse.pishon.esgen.views;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -15,21 +15,23 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import hk.ust.cse.pishon.esgen.compare.CompareInput;
 import hk.ust.cse.pishon.esgen.model.Change;
 import hk.ust.cse.pishon.esgen.model.EditOp;
-import hk.ust.cse.pishon.esgen.model.EditScript;
 
-public class ScriptView extends ViewPart {
+public class ScriptStatView extends ViewPart {
 
-	public static final String ID = "hk.ust.cse.pishon.esgen.views.scriptview";
+	public static final String ID = "hk.ust.cse.pishon.esgen.views.scriptstatview";
 
 	private TableViewer viewer;
 	private String changeName;
-	private List<EditOp> editOps = new ArrayList<EditOp>();
+	private TreeMap<EditOp, List<String>> stat = new TreeMap<>();
 	private IPartListener2 listener;
 	private Font font;
 
@@ -112,7 +114,32 @@ public class ScriptView extends ViewPart {
 				return "";
 			}
 		});
-		viewer.setInput(editOps);
+		
+		TableViewerColumn colCount = new TableViewerColumn(viewer, SWT.NONE);
+		colCount.getColumn().setWidth(50);
+		colCount.getColumn().setText("Count");
+		colCount.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				if(stat.containsKey(element))
+					return String.valueOf(stat.get(element).size());
+				return "";
+			}
+		});
+		
+		TableViewerColumn colScripts = new TableViewerColumn(viewer, SWT.NONE);
+		colScripts.getColumn().setWidth(200);
+		colScripts.getColumn().setText("Scripts");
+		colScripts.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				if(stat.containsKey(element)) {
+					return String.join(",", stat.get(element));
+				}
+				return "";
+			}
+		});
+		viewer.setInput(stat.keySet());
 
 		//Create context menu.
 		MenuManager menuManager = new MenuManager();
@@ -144,7 +171,7 @@ public class ScriptView extends ViewPart {
 			@Override
 			public void partClosed(IWorkbenchPartReference partRef) {
 				if(partRef.getPage().getActiveEditor() == null)
-					setInput(null, null);
+					setInput(null);
 			}
 
 			@Override
@@ -162,22 +189,40 @@ public class ScriptView extends ViewPart {
 				IEditorInput input = partRef.getPage().getActiveEditor().getEditorInput();
 				if(input instanceof CompareInput){
 					Change change = ((CompareInput) input).getChange();
-					setInput(change.getName(), change.getScript());
+					setInput(change.getName());
 				}
 			}
 		};
 
 		getViewSite().getPage().addPartListener(listener);
 	}
-
-	public void addEditOp(EditOp op){
-		editOps.add(op);
-		viewer.refresh();
+	
+	public void setInput() {
+		setInput(this.changeName);
+	}
+	
+	public void setInput(String changeName) {
+		this.changeName = changeName;
+		if(changeName == null) {
+			setStat(null);
+		} else {
+			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+			final IWorkbenchPage page = window.getActivePage();	
+			ScriptList scriptList = (ScriptList)page.findView(ScriptList.ID);		
+			if(scriptList != null)
+				setStat(scriptList.getStat(changeName));
+		}
+	}
+	
+	public String getChangeName() {
+		return changeName;
 	}
 
-	public void removeEditOp(EditOp element) {
-		editOps.remove(element);
-		viewer.refresh();
+	private void setStat(TreeMap<EditOp, List<String>> stat) {
+		this.stat.clear();
+		if(stat != null)
+			this.stat.putAll(stat);
+		viewer.setInput(this.stat.keySet());
 	}
 
 	@Override
@@ -193,25 +238,11 @@ public class ScriptView extends ViewPart {
 		getViewSite().getPage().removePartListener(listener);
 	}
 	
-	public String getChangeName() {
-		return changeName;
-	}
-
-	public void setInput(String changeName, EditScript script) {
-		if (script != null) {
-			this.changeName = changeName;
-			editOps = script.getEditOps();
-			viewer.setInput(editOps);
-		}else{
-			changeName = null;
-			editOps = null;
-			viewer.setInput(null);
-		}
-	}
-
-	public void clearAll() {
-		editOps.clear();
+	public void clearScript() {
 		viewer.refresh();
 	}
 
+	public void clearAll() {
+		viewer.refresh();
+	}
 }

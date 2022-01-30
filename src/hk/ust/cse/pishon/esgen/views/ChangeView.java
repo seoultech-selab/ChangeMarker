@@ -14,6 +14,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.compare.CompareUI;
 import org.eclipse.core.resources.IWorkspace;
@@ -111,7 +112,11 @@ public class ChangeView extends ViewPart {
 					CompareUI.openCompareEditorOnPage(input, page);
 					IViewPart scriptViewer = page.findView(ScriptView.ID);
 					if(scriptViewer != null){
-						((ScriptView)scriptViewer).setInput(change.getScript());
+						((ScriptView)scriptViewer).setInput(change.getName(), change.getScript());
+					}
+					ScriptStatView scriptStatViewer = (ScriptStatView)page.findView(ScriptStatView.ID);					
+					if(scriptStatViewer != null){
+						scriptStatViewer.setInput(change.getName());
 					}
 				}
 			}
@@ -132,7 +137,10 @@ public class ChangeView extends ViewPart {
 					partRef.getPage().closeAllEditors(false);
 					IViewPart scriptViewer = page.findView(ScriptView.ID);
 					if(scriptViewer != null)
-						((ScriptView)scriptViewer).setInput(null);	
+						((ScriptView)scriptViewer).setInput(null, null);
+					IViewPart scriptStatViewer = page.findView(ScriptStatView.ID);
+					if(scriptStatViewer != null)
+						((ScriptStatView)scriptStatViewer).setInput(null);	
 				}
 			}
 
@@ -220,6 +228,15 @@ public class ChangeView extends ViewPart {
 	@Override
 	public void setFocus() {
 		viewer.getControl().setFocus();
+	}
+	
+	public void updateInput(Map<String, Change> updates) {
+		//Update changes only if they're already on the list.
+		List<Change> newInput = new ArrayList<>();
+		for(Change c : changes)
+			if(updates.containsKey(c.getName()))
+				newInput.add(updates.get(c.getName()));
+		setInput(newInput);
 	}
 
 	public void setInput(List<Change> newInput){

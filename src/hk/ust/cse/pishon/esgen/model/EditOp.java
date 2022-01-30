@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import org.eclipse.jface.text.ITextSelection;
 
-public class EditOp implements Serializable {
+public class EditOp implements Serializable, Comparable<EditOp> {
 
 	private static final long serialVersionUID = 3978037116216778196L;
 	public static final String OP_INSERT = "Insert";
@@ -128,5 +128,57 @@ public class EditOp implements Serializable {
 			sb.append(")");
 		}
 		return sb.toString();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof EditOp) {
+			EditOp op = (EditOp)obj;
+			if(op.type.equals(type)) {
+				boolean ret = true;
+				if(!type.equals(OP_DELETE)) {
+					ret = ret && newStartLine == op.newStartLine 
+							&& newStartPos ==  op.newStartPos
+							&& newLength == op.newLength
+							&& newCode.equals(op.newCode);
+				}
+				if(!type.equals(OP_INSERT)) {
+					ret = ret && oldStartLine == op.oldStartLine 
+							&& oldStartPos ==  op.oldStartPos
+							&& oldLength == op.oldLength
+							&& oldCode.equals(op.oldCode);
+				}
+				return ret;
+			}
+		}
+		return false;
+	}
+	
+	@Override
+	public int compareTo(EditOp op) {
+		int cmp = 0;
+		if(oldStartLine == op.oldStartLine
+				&& oldStartPos == op.oldStartPos) {
+			cmp = op.oldLength - oldLength;
+		} else {
+			cmp += oldStartLine - op.oldStartLine;
+			cmp += oldStartPos - op.oldStartPos;
+		}
+		if(cmp == 0 && oldCode != null && !oldCode.equals(op.oldCode))
+			cmp = 1;
+		if(cmp == 0) {
+			if(newStartLine == op.newStartLine
+					&& newStartPos == op.newStartPos) {
+				cmp = op.newLength - newLength;
+			} else {
+				cmp += newStartLine - op.newStartLine;
+				cmp += newStartPos - op.newStartPos;
+			}
+			if(cmp == 0 && newCode != null && !newCode.equals(op.newCode))
+				cmp = 1;
+		}
+		if(cmp == 0 && !type.equals(op.type))
+			cmp = type.compareTo(op.type);
+		return cmp;
 	}
 }

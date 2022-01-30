@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="Change Marker" uid="hk.ust.cse.pishon.esgen.products.product1" id="hk.ust.cse.pishon.esgen.product1" application="hk.ust.cse.pishon.esgen.application" version="1.0.0.qualifier" useFeatures="false" includeLaunchers="true">
-
+<product name="Change Marker" uid="hk.ust.cse.pishon.esgen.products.product" id="hk.ust.cse.pishon.esgen.product" application="hk.ust.cse.pishon.esgen.application" version="1.0.0.qualifier" useFeatures="false" includeLaunchers="true">
 
    <configIni use="default">
    </configIni>
@@ -20,7 +19,6 @@
 
    <windowImages/>
 
-
    <launcher name="ChangeMarker">
       <macosx icon="/hk.ust.cse.pishon.esgen/icons/document.icns"/>
       <win useIco="true">
@@ -29,12 +27,10 @@
       </win>
    </launcher>
 
-
    <vm>
       <macos include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8</macos>
       <windows include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8</windows>
    </vm>
-
 
    <plugins>
       <plugin id="biz.aQute.bndlib"/>

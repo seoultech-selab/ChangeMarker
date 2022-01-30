@@ -34,6 +34,19 @@
             id="hk.ust.cse.pishon.esgen.views.scriptview"
             name="Edit Script">
       </view>
+      <view
+            class="hk.ust.cse.pishon.esgen.views.ScriptStatView"
+            icon="icons/templates.png"
+            id="hk.ust.cse.pishon.esgen.views.scriptstatview"
+            name="Script Statistics">
+      </view>
+      <view
+            allowMultiple="false"
+            class="hk.ust.cse.pishon.esgen.views.ScriptList"
+            icon="icons/package.png"
+            id="hk.ust.cse.pishon.esgen.views.scriptlist"
+            name="Script List">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
@@ -52,6 +65,12 @@
                   label="Load Changes"
                   style="push"
                   tooltip="Load Changes from a Selected Directory">
+            </command>
+            <command
+                  commandId="hk.ust.cse.pishon.esgen.commands.LoadScript"
+                  label="Load Existing Scripts"
+                  style="push"
+                  tooltip="Load Existing Edit Scripts">
             </command>
             <command
                   commandId="hk.ust.cse.pishon.esgen.commands.Export"
@@ -101,6 +120,24 @@
                <parameter
                      name="hk.ust.cse.pishon.esgen.views.showView.viewId"
                      value="hk.ust.cse.pishon.esgen.views.scriptview">
+               </parameter>
+            </command>
+            <command
+                  commandId="hk.ust.cse.pishon.esgen.commands.ShowScriptStatView"
+                  label="Show Script Statistics"
+                  style="push">
+               <parameter
+                     name="hk.ust.cse.pishon.esgen.views.showView.viewId"
+                     value="hk.ust.cse.pishon.esgen.views.scriptlist">
+               </parameter>
+            </command>
+            <command
+                  commandId="hk.ust.cse.pishon.esgen.commands.ShowScriptList"
+                  label="Show Script List"
+                  style="push">
+               <parameter
+                     name="hk.ust.cse.pishon.esgen.views.showView.viewId"
+                     value="hk.ust.cse.pishon.esgen.views.scriptlist">
                </parameter>
             </command>
          </menu>
@@ -197,6 +234,16 @@
                tooltip="Clear all edit operations in this script.">
          </command>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:hk.ust.cse.pishon.esgen.views.scriptstatview">
+         <command
+               commandId="hk.ust.cse.pishon.esgen.commands.Copy"
+               label="Copy Selected"
+               style="push"
+               tooltip="Copy Selected Edit Operations">
+         </command>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -247,12 +294,44 @@
          </commandParameter>
       </command>
       <command
+            defaultHandler="hk.ust.cse.pishon.esgen.handlers.ShowViewHandler"
+            id="hk.ust.cse.pishon.esgen.commands.ShowScriptStatView"
+            name="Show Script Statistics">
+         <commandParameter
+               id="hk.ust.cse.pishon.esgen.views.showView.viewId"
+               name="Script Stat View"
+               optional="true"
+               values="hk.ust.cse.pishon.esgen.views.scriptstatview">
+         </commandParameter>
+      </command>
+      <command
+            defaultHandler="hk.ust.cse.pishon.esgen.handlers.ShowViewHandler"
+            id="hk.ust.cse.pishon.esgen.commands.ShowScriptList"
+            name="Show Script List">
+         <commandParameter
+               id="hk.ust.cse.pishon.esgen.views.showView.viewId"
+               name="Script List"
+               optional="true"
+               values="hk.ust.cse.pishon.esgen.views.scriptlist">
+         </commandParameter>
+      </command>
+      <command
             id="hk.ust.cse.pishon.esgen.commands.Export"
             name="Export">
       </command>
       <command
             id="hk.ust.cse.pishon.esgen.commands.LoadChange"
             name="Load Changes">
+      </command>
+      <command
+            description="Load Existing Script Files."
+            id="hk.ust.cse.pishon.esgen.commands.LoadScript"
+            name="Load Scripts">
+      </command>
+      <command
+            description="Copy Selected Edit Operations to Script."
+            id="hk.ust.cse.pishon.esgen.commands.Copy"
+            name="Copy Selected">
       </command>
    </extension>
    <extension
@@ -360,6 +439,14 @@
             class="hk.ust.cse.pishon.esgen.handlers.LoadChangeHandler"
             commandId="hk.ust.cse.pishon.esgen.commands.LoadChange">
       </handler>
+      <handler
+            class="hk.ust.cse.pishon.esgen.handlers.LoadScriptHandler"
+            commandId="hk.ust.cse.pishon.esgen.commands.LoadScript">
+      </handler>
+      <handler
+            class="hk.ust.cse.pishon.esgen.handlers.CopyHandler"
+            commandId="hk.ust.cse.pishon.esgen.commands.Copy">
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.services">
@@ -377,18 +464,6 @@
    </extension>
    <extension
          id="product"
-         point="org.eclipse.core.runtime.products">
-      <product
-            application="hk.ust.cse.pishon.esgen.application"
-            name="Change Marker">
-         <property
-               name="appName"
-               value="Change Marker">
-         </property>
-      </product>
-   </extension>
-   <extension
-         id="product1"
          point="org.eclipse.core.runtime.products">
       <product
             application="hk.ust.cse.pishon.esgen.application"
