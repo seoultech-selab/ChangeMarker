@@ -45,6 +45,22 @@ public class EditOp implements Serializable, Comparable<EditOp> {
 		}
 	}
 
+	public EditOp(EditOp op) {
+		super();
+		this.type = op.type;
+		this.oldCode = op.oldCode;
+		this.oldStartPos = op.oldStartPos;
+		this.oldLength = op.oldLength;
+		this.oldStartLine = op.oldStartLine;
+		this.oldEndLine = op.oldEndLine;
+		this.newCode = op.newCode;
+		this.newStartPos = op.newStartPos;
+		this.newLength = op.newLength;
+		this.newStartLine = op.newStartLine;
+		this.newEndLine = op.newEndLine;
+	}
+
+
 
 	public String getType() {
 		return type;
@@ -129,7 +145,7 @@ public class EditOp implements Serializable, Comparable<EditOp> {
 		}
 		return sb.toString();
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof EditOp) {
@@ -137,13 +153,13 @@ public class EditOp implements Serializable, Comparable<EditOp> {
 			if(op.type.equals(type)) {
 				boolean ret = true;
 				if(!type.equals(OP_DELETE)) {
-					ret = ret && newStartLine == op.newStartLine 
+					ret = ret && newStartLine == op.newStartLine
 							&& newStartPos ==  op.newStartPos
 							&& newLength == op.newLength
 							&& newCode.equals(op.newCode);
 				}
 				if(!type.equals(OP_INSERT)) {
-					ret = ret && oldStartLine == op.oldStartLine 
+					ret = ret && oldStartLine == op.oldStartLine
 							&& oldStartPos ==  op.oldStartPos
 							&& oldLength == op.oldLength
 							&& oldCode.equals(op.oldCode);
@@ -153,7 +169,7 @@ public class EditOp implements Serializable, Comparable<EditOp> {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public int compareTo(EditOp op) {
 		int cmp = 0;
@@ -180,5 +196,23 @@ public class EditOp implements Serializable, Comparable<EditOp> {
 		if(cmp == 0 && !type.equals(op.type))
 			cmp = type.compareTo(op.type);
 		return cmp;
+	}
+
+
+	public EditOp trim() {
+		EditOp op = new EditOp(this);
+		if(op.oldCode != null && op.oldCode.length() > op.oldCode.trim().length()) {
+			int len = op.oldCode.length();
+			op.oldStartPos += len - op.oldCode.stripLeading().length();
+			op.oldLength -= len - op.oldCode.stripTrailing().length();
+			op.oldCode = op.oldCode.trim();
+		}
+		if(op.newCode != null && op.newCode.length() > op.newCode.trim().length()) {
+			int len = op.newCode.length();
+			op.newStartPos += len - op.newCode.stripLeading().length();
+			op.newLength -= len - op.newCode.stripTrailing().length();
+			op.newCode = op.newCode.trim();
+		}
+		return op;
 	}
 }
