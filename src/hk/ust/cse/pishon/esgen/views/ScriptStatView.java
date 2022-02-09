@@ -62,7 +62,7 @@ public class ScriptStatView extends ViewPart {
 		});
 
 		TableViewerColumn colOldCode = new TableViewerColumn(viewer, SWT.NONE);
-		colOldCode.getColumn().setWidth(300);
+		colOldCode.getColumn().setWidth(200);
 		colOldCode.getColumn().setText("Old Code");
 		colOldCode.setLabelProvider(new ColumnLabelProvider() {
 			@Override
@@ -87,9 +87,37 @@ public class ScriptStatView extends ViewPart {
 				return "";
 			}
 		});
+		
+		TableViewerColumn colOldPos = new TableViewerColumn(viewer, SWT.NONE);
+		colOldPos.getColumn().setWidth(50);
+		colOldPos.getColumn().setText("S.Pos.");
+		colOldPos.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				if(element instanceof EditOp){
+					int v = ((EditOp)element).getOldStartPos();
+					return v > 0 ? String.valueOf(v) : "";
+				}
+				return "";
+			}
+		});
+		
+		TableViewerColumn colOldLen = new TableViewerColumn(viewer, SWT.NONE);
+		colOldLen.getColumn().setWidth(50);
+		colOldLen.getColumn().setText("Length");
+		colOldLen.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				if(element instanceof EditOp){
+					int v = ((EditOp)element).getOldLength();
+					return v > 0 ? String.valueOf(v) : "";
+				}
+				return "";
+			}
+		});
 
 		TableViewerColumn colNewCode = new TableViewerColumn(viewer, SWT.NONE);
-		colNewCode.getColumn().setWidth(300);
+		colNewCode.getColumn().setWidth(200);
 		colNewCode.getColumn().setText("New Code");
 		colNewCode.setLabelProvider(new ColumnLabelProvider() {
 			@Override
@@ -110,6 +138,34 @@ public class ScriptStatView extends ViewPart {
 				if(element instanceof EditOp){
 					int line = ((EditOp)element).getNewStartLine();
 					return line > 0 ? String.valueOf(line) : "";
+				}
+				return "";
+			}
+		});
+		
+		TableViewerColumn colNewPos = new TableViewerColumn(viewer, SWT.NONE);
+		colNewPos.getColumn().setWidth(50);
+		colNewPos.getColumn().setText("S.Pos.");
+		colNewPos.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				if(element instanceof EditOp){
+					int v = ((EditOp)element).getNewStartPos();
+					return v > 0 ? String.valueOf(v) : "";
+				}
+				return "";
+			}
+		});
+		
+		TableViewerColumn colNewLen = new TableViewerColumn(viewer, SWT.NONE);
+		colNewLen.getColumn().setWidth(50);
+		colNewLen.getColumn().setText("Length");
+		colNewLen.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				if(element instanceof EditOp){
+					int v = ((EditOp)element).getNewLength();
+					return v > 0 ? String.valueOf(v) : "";
 				}
 				return "";
 			}

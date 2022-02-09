@@ -47,6 +47,14 @@
             id="hk.ust.cse.pishon.esgen.views.scriptlist"
             name="Script List">
       </view>
+      <view
+            allowMultiple="false"
+            class="hk.ust.cse.pishon.esgen.views.MultiScriptView"
+            icon="icons/templates.png"
+            id="hk.ust.cse.pishon.esgen.views.multiscriptview"
+            name="Multiple Script View"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
@@ -67,16 +75,32 @@
                   tooltip="Load Changes from a Selected Directory">
             </command>
             <command
-                  commandId="hk.ust.cse.pishon.esgen.commands.LoadScript"
-                  label="Load Existing Scripts"
+                  commandId="hk.ust.cse.pishon.esgen.commands.LoadScriptStat"
+                  label="Load Script Statistics"
                   style="push"
                   tooltip="Load Existing Edit Scripts">
             </command>
+            <command
+                  commandId="hk.ust.cse.pishon.esgen.commands.LoadScript"
+                  label="Load Script from a Stored File."
+                  style="push"
+                  tooltip="Load Scripts from a stored file.">
+            </command>
+            <separator
+                  name="hk.ust.cse.pishon.esgen.separator1"
+                  visible="true">
+            </separator>
             <command
                   commandId="hk.ust.cse.pishon.esgen.commands.Export"
                   label="Export Edit Scripts"
                   style="push"
                   tooltip="Export edit scripts for all changes.">
+            </command>
+            <command
+                  commandId="hk.ust.cse.pishon.esgen.commands.ExportAll"
+                  label="Export All Edit Scripts"
+                  style="push"
+                  tooltip="Export all the edit scripts in Multi Script View into a file.">
             </command>
             <separator
                   name="hk.ust.cse.pishon.esgen.separator1"
@@ -138,6 +162,15 @@
                <parameter
                      name="hk.ust.cse.pishon.esgen.views.showView.viewId"
                      value="hk.ust.cse.pishon.esgen.views.scriptlist">
+               </parameter>
+            </command>
+            <command
+                  commandId="hk.ust.cse.pishon.esgen.commands.ShowScriptList"
+                  label="Show Multiple Script View"
+                  style="push">
+               <parameter
+                     name="hk.ust.cse.pishon.esgen.views.showView.viewId"
+                     value="hk.ust.cse.pishon.esgen.views.multiscriptview">
                </parameter>
             </command>
          </menu>
@@ -244,6 +277,28 @@
                tooltip="Copy Selected Edit Operations">
          </command>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:hk.ust.cse.pishon.esgen.views.multiscriptview">
+         <command
+               commandId="hk.ust.cse.pishon.esgen.commands.CreateScript"
+               label="Create New Script"
+               style="push"
+               tooltip="Create a new script for edit operations.">
+         </command>
+         <command
+               commandId="hk.ust.cse.pishon.esgen.commands.DeleteScript"
+               label="Delete Script"
+               style="push"
+               tooltip="Delete the Selected Script.">
+         </command>
+         <command
+               commandId="hk.ust.cse.pishon.esgen.commands.DeleteOp"
+               label="Delete Operation"
+               style="push"
+               tooltip="Delete selected edit operation.">
+         </command>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -324,14 +379,33 @@
             name="Load Changes">
       </command>
       <command
-            description="Load Existing Script Files."
-            id="hk.ust.cse.pishon.esgen.commands.LoadScript"
-            name="Load Scripts">
+            description="Load Statistics from Existing Script Files."
+            id="hk.ust.cse.pishon.esgen.commands.LoadScriptStat"
+            name="Load Script Statistics">
       </command>
       <command
             description="Copy Selected Edit Operations to Script."
             id="hk.ust.cse.pishon.esgen.commands.Copy"
             name="Copy Selected">
+      </command>
+      <command
+            description="Create a new script."
+            id="hk.ust.cse.pishon.esgen.commands.CreateScript"
+            name="Create New Script">
+      </command>
+      <command
+            description="Delete the Selected Script."
+            id="hk.ust.cse.pishon.esgen.commands.DeleteScript"
+            name="Delete Script">
+      </command>
+      <command
+            id="hk.ust.cse.pishon.esgen.commands.ExportAll"
+            name="Export All">
+      </command>
+      <command
+            description="Load Scripts from a stored file."
+            id="hk.ust.cse.pishon.esgen.commands.LoadScriptStat"
+            name="Load Script">
       </command>
    </extension>
    <extension
@@ -440,12 +514,28 @@
             commandId="hk.ust.cse.pishon.esgen.commands.LoadChange">
       </handler>
       <handler
-            class="hk.ust.cse.pishon.esgen.handlers.LoadScriptHandler"
-            commandId="hk.ust.cse.pishon.esgen.commands.LoadScript">
+            class="hk.ust.cse.pishon.esgen.handlers.LoadScriptStatHandler"
+            commandId="hk.ust.cse.pishon.esgen.commands.LoadScriptStat">
       </handler>
       <handler
             class="hk.ust.cse.pishon.esgen.handlers.CopyHandler"
             commandId="hk.ust.cse.pishon.esgen.commands.Copy">
+      </handler>
+      <handler
+            class="hk.ust.cse.pishon.esgen.handlers.CreateScriptHandler"
+            commandId="hk.ust.cse.pishon.esgen.commands.CreateScript">
+      </handler>
+      <handler
+            class="hk.ust.cse.pishon.esgen.handlers.DeleteScriptHandler"
+            commandId="hk.ust.cse.pishon.esgen.commands.DeleteScript">
+      </handler>
+      <handler
+            class="hk.ust.cse.pishon.esgen.handlers.ExportAllHandler"
+            commandId="hk.ust.cse.pishon.esgen.commands.ExportAll">
+      </handler>
+      <handler
+            class="hk.ust.cse.pishon.esgen.handlers.LoadScriptHandler"
+            commandId="hk.ust.cse.pishon.esgen.commands.LoadScript">
       </handler>
    </extension>
    <extension

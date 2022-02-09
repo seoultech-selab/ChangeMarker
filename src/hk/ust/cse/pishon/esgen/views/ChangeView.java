@@ -13,6 +13,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,12 +42,16 @@ import org.eclipse.ui.part.ViewPart;
 
 import hk.ust.cse.pishon.esgen.compare.CompareInput;
 import hk.ust.cse.pishon.esgen.model.Change;
+import hk.ust.cse.pishon.esgen.model.Node;
 
 public class ChangeView extends ViewPart {
 	public static final String ID = "hk.ust.cse.pishon.esgen.views.changeview";
 	public static final String METADATA_PATH = ".metadata" + File.separator + "changemarker";
+	public static final String CHANGE_SAVE_FILE = "changes.obj";
+	public static final String SCRIPT_SAVE_FILE = "scripts.obj";
 	private TableViewer viewer;
 	private List<Change> changes;
+	private Map<String, Node> scripts;
 	private String changePath;	
 	
 	public String getChangePath() {
@@ -55,7 +60,7 @@ public class ChangeView extends ViewPart {
 	
 	public void setChangePath(String changePath) {
 		this.changePath = changePath;
-		this.changes = readChanges();
+		readSaved();
 		viewer.setInput(changes);
 	}
 
@@ -100,7 +105,7 @@ public class ChangeView extends ViewPart {
 		viewer.setLabelProvider(new ViewLabelProvider());
 		// Provide the input to the ContentProvider
 		loadChangePath();
-		changes = readChanges();
+		readSaved();
 		viewer.setInput(changes);
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
 			@Override
@@ -118,6 +123,9 @@ public class ChangeView extends ViewPart {
 					if(scriptStatViewer != null){
 						scriptStatViewer.setInput(change.getName());
 					}
+					MultiScriptView multiScriptViewer = (MultiScriptView)page.findView(MultiScriptView.ID);
+					if(multiScriptViewer != null)
+						multiScriptViewer.setInput(change.getName());	
 				}
 			}
 		});
@@ -140,7 +148,10 @@ public class ChangeView extends ViewPart {
 						((ScriptView)scriptViewer).setInput(null, null);
 					IViewPart scriptStatViewer = page.findView(ScriptStatView.ID);
 					if(scriptStatViewer != null)
-						((ScriptStatView)scriptStatViewer).setInput(null);	
+						((ScriptStatView)scriptStatViewer).setInput(null);
+					IViewPart multiScriptViewer = page.findView(MultiScriptView.ID);
+					if(multiScriptViewer != null)
+						((MultiScriptView)multiScriptViewer).setInput(null);	
 				}
 			}
 
@@ -174,8 +185,9 @@ public class ChangeView extends ViewPart {
 	protected void saveChanges() {
 		if(changePath == null)
 			return;
-		File saveFile = getSaveFile();
-		File saveMetaDir = saveFile.getParentFile();
+		File changeSaveFile = getSaveFile(CHANGE_SAVE_FILE);
+		File scriptSaveFile = getSaveFile(SCRIPT_SAVE_FILE);
+		File saveMetaDir = changeSaveFile.getParentFile();
 		File pathFile = getChangePathFile();		
 		File workspaceMetaDir = pathFile.getParentFile();
 		if(!saveMetaDir.exists()){
@@ -188,19 +200,25 @@ public class ChangeView extends ViewPart {
 		}		
 		ObjectOutputStream oos = null;
 		BufferedWriter writer = null;
+		ObjectOutputStream oos2 = null;
 		try {
-			oos = new ObjectOutputStream(new FileOutputStream(saveFile));
+			oos = new ObjectOutputStream(new FileOutputStream(changeSaveFile));
 			oos.writeObject(changes);
 			oos.flush();
+			oos2 = new ObjectOutputStream(new FileOutputStream(scriptSaveFile));
+			oos2.writeObject(scripts);
+			oos2.flush();
 			writer = new BufferedWriter(new FileWriter(pathFile));
 			writer.write(changePath);
-			writer.flush();		
+			writer.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
 			try {
 				if(oos != null)
 					oos.close();
+				if(oos2 != null)
+					oos2.close();
 				if(writer != null)
 					writer.close();
 			} catch (IOException e) {
@@ -217,8 +235,8 @@ public class ChangeView extends ViewPart {
 		return pathFile;
 	}
 	
-	private File getSaveFile(){
-		File saveFile = new File(changePath + File.separator + METADATA_PATH + File.separator + "changes.obj");
+	private File getSaveFile(String fileName){
+		File saveFile = new File(changePath + File.separator + METADATA_PATH + File.separator + fileName);
 		return saveFile;
 	}
 
@@ -249,37 +267,33 @@ public class ChangeView extends ViewPart {
 		List<Change> changes = new ArrayList<Change>(this.changes);
 		return changes;
 	}
+	
+	public Map<String, Node> getAllScripts() {
+		return scripts;
+	}
+	
+	public Node getScripts(String changeName) {
+		scripts.putIfAbsent(changeName, new Node(changeName));
+		return scripts.get(changeName);
+	}
+	
+	public void setScripts(File f) {
+		scripts = (Map<String, Node>)readFile(f);
+	}
+	
+	public void setScripts(Map<String, Node> map) {
+		if(scripts == null)
+			scripts = new HashMap<>();		
+		scripts.putAll(map);
+	}
 
-	private List<Change> readChanges() {
-		List<Change> changes = new ArrayList<Change>();		
-		File saveFile = getSaveFile();
-		if(saveFile.exists()){
-			FileInputStream fis = null;
-			ObjectInputStream in = null;
-			try {
-				fis = new FileInputStream(saveFile);
-				in = new ObjectInputStream(fis);
-				Object obj = in.readObject();
-				if(obj instanceof List<?>){
-					changes = (List<Change>)obj;
-				}
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			} finally {
-				try {
-					if(in != null)
-						in.close();
-					if(fis != null)
-						fis.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+	private void readSaved() {
+		File changeSaveFile = getSaveFile(CHANGE_SAVE_FILE);
+		File scriptSaveFile = getSaveFile(SCRIPT_SAVE_FILE);
+		if(changeSaveFile.exists()){
+			changes = (List<Change>)readFile(changeSaveFile);
 		}else{
+			changes = new ArrayList<>();
 			IWorkspace workspace = ResourcesPlugin.getWorkspace();
 			IPath path = workspace.getRoot().getLocation();
 			File rootDir = changePath == null ? path.toFile() : new File(changePath);
@@ -293,8 +307,43 @@ public class ChangeView extends ViewPart {
 				}
 			}
 		}
+		if(scriptSaveFile.exists()) {
+			scripts = (Map<String, Node>)readFile(scriptSaveFile);
+			if(scripts == null)
+				scripts = new HashMap<>();
+		} else {
+			scripts = new HashMap<>();
+			for(Change c : changes)
+				scripts.put(c.getName(), new Node(c.getName()));
+		}
 		Collections.sort(changes, (c1, c2) -> c1.getName().compareTo(c2.getName()));
-		return changes;
+	}
+
+	private Object readFile(File changeSaveFile) {
+		FileInputStream fis = null;
+		ObjectInputStream in = null;
+		Object obj = null;
+		try {
+			fis = new FileInputStream(changeSaveFile);
+			in = new ObjectInputStream(fis);
+			obj = in.readObject();			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(in != null)
+					in.close();
+				if(fis != null)
+					fis.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return obj;
 	}
 
 	private void loadChangePath() {
