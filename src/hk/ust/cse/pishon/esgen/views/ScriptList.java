@@ -17,7 +17,6 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
@@ -99,37 +98,6 @@ public class ScriptList extends ViewPart {
 			}
 		}); */
 		page.addPartListener(new IPartListener2(){
-			@Override
-			public void partActivated(IWorkbenchPartReference partRef) {
-			}
-
-			@Override
-			public void partBroughtToTop(IWorkbenchPartReference partRef) {
-			}
-
-			@Override
-			public void partClosed(IWorkbenchPartReference partRef) {
-			}
-
-			@Override
-			public void partDeactivated(IWorkbenchPartReference partRef) {
-			}
-
-			@Override
-			public void partOpened(IWorkbenchPartReference partRef) {
-			}
-
-			@Override
-			public void partHidden(IWorkbenchPartReference partRef) {
-			}
-
-			@Override
-			public void partVisible(IWorkbenchPartReference partRef) {
-			}
-
-			@Override
-			public void partInputChanged(IWorkbenchPartReference partRef) {
-			}
 		});
 	}
 	@Override

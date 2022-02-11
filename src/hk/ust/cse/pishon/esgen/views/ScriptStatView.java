@@ -87,7 +87,7 @@ public class ScriptStatView extends ViewPart {
 				return "";
 			}
 		});
-		
+
 		TableViewerColumn colOldPos = new TableViewerColumn(viewer, SWT.NONE);
 		colOldPos.getColumn().setWidth(50);
 		colOldPos.getColumn().setText("S.Pos.");
@@ -101,7 +101,7 @@ public class ScriptStatView extends ViewPart {
 				return "";
 			}
 		});
-		
+
 		TableViewerColumn colOldLen = new TableViewerColumn(viewer, SWT.NONE);
 		colOldLen.getColumn().setWidth(50);
 		colOldLen.getColumn().setText("Length");
@@ -142,7 +142,7 @@ public class ScriptStatView extends ViewPart {
 				return "";
 			}
 		});
-		
+
 		TableViewerColumn colNewPos = new TableViewerColumn(viewer, SWT.NONE);
 		colNewPos.getColumn().setWidth(50);
 		colNewPos.getColumn().setText("S.Pos.");
@@ -156,7 +156,7 @@ public class ScriptStatView extends ViewPart {
 				return "";
 			}
 		});
-		
+
 		TableViewerColumn colNewLen = new TableViewerColumn(viewer, SWT.NONE);
 		colNewLen.getColumn().setWidth(50);
 		colNewLen.getColumn().setText("Length");
@@ -170,7 +170,7 @@ public class ScriptStatView extends ViewPart {
 				return "";
 			}
 		});
-		
+
 		TableViewerColumn colCount = new TableViewerColumn(viewer, SWT.NONE);
 		colCount.getColumn().setWidth(50);
 		colCount.getColumn().setText("Count");
@@ -182,7 +182,7 @@ public class ScriptStatView extends ViewPart {
 				return "";
 			}
 		});
-		
+
 		TableViewerColumn colScripts = new TableViewerColumn(viewer, SWT.NONE);
 		colScripts.getColumn().setWidth(200);
 		colScripts.getColumn().setText("Scripts");
@@ -252,24 +252,25 @@ public class ScriptStatView extends ViewPart {
 
 		getViewSite().getPage().addPartListener(listener);
 	}
-	
+
 	public void setInput() {
 		setInput(this.changeName);
 	}
-	
+
 	public void setInput(String changeName) {
 		this.changeName = changeName;
 		if(changeName == null) {
 			setStat(null);
 		} else {
 			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-			final IWorkbenchPage page = window.getActivePage();	
-			ScriptList scriptList = (ScriptList)page.findView(ScriptList.ID);		
+			final IWorkbenchPage page = window.getActivePage();
+			ScriptList scriptList = (ScriptList)page.findView(ScriptList.ID);
 			if(scriptList != null)
 				setStat(scriptList.getStat(changeName));
 		}
+		viewer.getControl().redraw();
 	}
-	
+
 	public String getChangeName() {
 		return changeName;
 	}
@@ -293,7 +294,7 @@ public class ScriptStatView extends ViewPart {
 			font.dispose();
 		getViewSite().getPage().removePartListener(listener);
 	}
-	
+
 	public void clearScript() {
 		viewer.refresh();
 	}

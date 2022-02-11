@@ -1,10 +1,5 @@
 package hk.ust.cse.pishon.esgen.views;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.eclipse.compare.CompareUI;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -22,7 +17,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -47,12 +41,12 @@ public class MultiScriptView extends ViewPart {
 	@Override
 	public void createPartControl(Composite parent) {
 		ResourceManager resourceManager = new LocalResourceManager(JFaceResources.getResources(), parent);
-		
+
 		viewer = new TreeViewer(parent);
 		viewer.setAutoExpandLevel(2);
 		viewer.getTree().setHeaderVisible(true);
 		viewer.getTree().setLinesVisible(true);
-		viewer.setContentProvider(new ITreeContentProvider() {			
+		viewer.setContentProvider(new ITreeContentProvider() {
 			@Override
 			public boolean hasChildren(Object element) {
 				if(element instanceof Node) {
@@ -60,7 +54,7 @@ public class MultiScriptView extends ViewPart {
 				}
 				return false;
 			}
-			
+
 			@Override
 			public Object getParent(Object element) {
 				if(element instanceof Node) {
@@ -68,12 +62,12 @@ public class MultiScriptView extends ViewPart {
 				}
 				return null;
 			}
-			
+
 			@Override
 			public Object[] getElements(Object inputElement) {
 				return getChildren(inputElement);
 			}
-			
+
 			@Override
 			public Object[] getChildren(Object parentElement) {
 				if(parentElement instanceof Node) {
@@ -82,9 +76,9 @@ public class MultiScriptView extends ViewPart {
 				return null;
 			}
 		});
-	
+
 		viewer.getTree().setFont(resourceManager.createFont(FontDescriptor.createFrom("Courier", 12, SWT.NORMAL)));
-		
+
 		TreeViewerColumn colName = new TreeViewerColumn(viewer, SWT.NONE);
 		colName.getColumn().setWidth(80);
 		colName.getColumn().setText("Name");
@@ -135,13 +129,13 @@ public class MultiScriptView extends ViewPart {
 		colOldLine.getColumn().setText("Line#");
 		colOldLine.setLabelProvider(new ColumnLabelProvider() {
 			@Override
-			public String getText(Object element) {				
+			public String getText(Object element) {
 				if(element instanceof Node) {
 					Node n = (Node)element;
 					if(n.value instanceof EditOp) {
 						int line = ((EditOp)n.value).getOldStartLine();
 						return line > 0 ? String.valueOf(line) : "";
-					}					
+					}
 				}
 				return "";
 			}
@@ -173,16 +167,16 @@ public class MultiScriptView extends ViewPart {
 					if(n.value instanceof EditOp) {
 						int line = ((EditOp)n.value).getNewStartLine();
 						return line > 0 ? String.valueOf(line) : "";
-					}					
+					}
 				}
 				return "";
 			}
 		});
 		viewer.setInput(scripts);
-		
+
 		//Double-click to select a script.
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		final IWorkbenchPage page = window.getActivePage();		
+		final IWorkbenchPage page = window.getActivePage();
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
 			@Override
 			public void doubleClick(DoubleClickEvent event) {
@@ -193,7 +187,7 @@ public class MultiScriptView extends ViewPart {
 						MultiScriptView multiScriptViewer = (MultiScriptView)page.findView(MultiScriptView.ID);
 						if(multiScriptViewer != null)
 							multiScriptViewer.setCurrent(n);
-					}											
+					}
 				}
 			}
 		});
@@ -237,6 +231,7 @@ public class MultiScriptView extends ViewPart {
 
 			@Override
 			public void partActivated(IWorkbenchPartReference partRef) {
+				System.out.println(partRef.getId());
 				if(partRef.getId().equals("org.eclipse.compare.CompareEditor")){
 					updateInput(partRef);
 				}
@@ -247,6 +242,7 @@ public class MultiScriptView extends ViewPart {
 				if(input instanceof CompareInput){
 					Change change = ((CompareInput) input).getChange();
 					setInput(change.getName());
+					System.out.println(change.getName());
 				}
 			}
 		};
@@ -271,20 +267,20 @@ public class MultiScriptView extends ViewPart {
 		curr.addChild(new Node(op));
 		viewer.refresh();
 	}
-	
+
 	public void createNewScript() {
 		int num = scripts != null ? scripts.size() : 0;
 		curr = new Node("Script"+num);
 		scripts.addChild(curr);
 	}
-	
+
 	public void removeEditOp(Node n) {
 		if(curr != null && n != null) {
 			n.getParent().children.remove(n);
 		}
 		viewer.refresh();
 	}
-	
+
 	public void refresh() {
 		viewer.refresh();
 	}
@@ -299,7 +295,7 @@ public class MultiScriptView extends ViewPart {
 		super.dispose();
 		getViewSite().getPage().removePartListener(listener);
 	}
-	
+
 	public String getChangeName() {
 		return changeName;
 	}
@@ -311,16 +307,17 @@ public class MultiScriptView extends ViewPart {
 			scripts = null;
 		} else {
 			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-			final IWorkbenchPage page = window.getActivePage();	
-			ChangeView changeView = (ChangeView)page.findView(ChangeView.ID);		
+			final IWorkbenchPage page = window.getActivePage();
+			ChangeView changeView = (ChangeView)page.findView(ChangeView.ID);
 			if(changeView != null) {
 				Node n = changeView.getScripts(changeName);
 				if(n != null)
 					scripts = n;
 			}
-			curr = scripts.hasChildren() ? scripts.children.get(scripts.size()-1) : null;
+			curr = scripts.hasChildren() ? scripts.children.get(0) : null;
 		}
 		viewer.setInput(scripts);
+		viewer.getControl().redraw();
 	}
 
 	public void clearAll() {

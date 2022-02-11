@@ -17,6 +17,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import hk.ust.cse.pishon.esgen.model.ScriptItem;
+import hk.ust.cse.pishon.esgen.views.ChangeView;
 import hk.ust.cse.pishon.esgen.views.ScriptList;
 import hk.ust.cse.pishon.esgen.views.ScriptStatView;
 
@@ -49,8 +50,12 @@ public class LoadScriptStatHandler extends AbstractHandler {
 					items.add(new ScriptItem(filterPath + File.separator + name));
 				scriptList.setInput(items);
 				ScriptStatView statView = (ScriptStatView)page.findView(ScriptStatView.ID);
-				if(statView != null) 
-					statView.setInput();				
+				if(statView != null)
+					statView.setInput();
+				ChangeView changeView = (ChangeView)page.findView(ChangeView.ID);
+				if(changeView != null) {
+					changeView.setScripts(items);
+				}
 			}
 		} catch (PartInitException e) {
 			e.printStackTrace();

@@ -15,7 +15,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import hk.ust.cse.pishon.esgen.compare.CompareInput;
@@ -170,14 +173,23 @@ public class ScriptView extends ViewPart {
 		getViewSite().getPage().addPartListener(listener);
 	}
 
+	private void updateChangeView() {
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		final IWorkbenchPage page = window.getActivePage();
+		ChangeView view = (ChangeView)page.findView(ChangeView.ID);
+		view.refresh();
+	}
+
 	public void addEditOp(EditOp op){
 		editOps.add(op);
 		viewer.refresh();
+		updateChangeView();
 	}
 
 	public void removeEditOp(EditOp element) {
 		editOps.remove(element);
 		viewer.refresh();
+		updateChangeView();
 	}
 
 	@Override
@@ -192,7 +204,7 @@ public class ScriptView extends ViewPart {
 			font.dispose();
 		getViewSite().getPage().removePartListener(listener);
 	}
-	
+
 	public String getChangeName() {
 		return changeName;
 	}
@@ -207,6 +219,7 @@ public class ScriptView extends ViewPart {
 			editOps = null;
 			viewer.setInput(null);
 		}
+		viewer.getControl().redraw();
 	}
 
 	public void clearAll() {
