@@ -275,7 +275,7 @@ public class MultiScriptView extends ViewPart {
 	}
 
 	public void removeEditOp(Node n) {
-		if(curr != null && n != null) {
+		if(curr != null && n != null && n.value instanceof EditOp) {
 			n.getParent().children.remove(n);
 		}
 		viewer.refresh();
@@ -324,9 +324,19 @@ public class MultiScriptView extends ViewPart {
 		scripts = null;
 		viewer.refresh();
 	}
+	
+	public void addScript(Node n) {
+		Node newScript = n.copy();
+		n.value = "Script"+scripts.children.size();
+		scripts.children.add(newScript);
+		viewer.refresh();
+	}
 
 	public void removeScript(Node n) {
 		scripts.children.remove(n);
+		if (curr == n) {
+			curr = null;
+		}
 		viewer.refresh();
 	}
 

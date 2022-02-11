@@ -38,4 +38,12 @@ public class Node implements Serializable {
 	public int size() {
 		return children.size();
 	}
+	
+	public Node copy() {
+		Node n = new Node(value != null ? value : null);
+		for(Node c : children) {
+			n.addChild(c.copy());
+		}
+		return n;
+	}
 }

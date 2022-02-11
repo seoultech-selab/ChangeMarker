@@ -298,6 +298,12 @@
                style="push"
                tooltip="Delete selected edit operation.">
          </command>
+         <command
+               commandId="hk.ust.cse.pishon.esgen.commands.CopyScript"
+               label="Copy Script"
+               style="push"
+               tooltip="Copy the Selected Script.">
+         </command>
       </menuContribution>
    </extension>
    <extension
@@ -406,6 +412,11 @@
             description="Load Scripts from a stored file."
             id="hk.ust.cse.pishon.esgen.commands.LoadScriptStat"
             name="Load Script">
+      </command>
+      <command
+            description="Copy a new script."
+            id="hk.ust.cse.pishon.esgen.commands.CopyScript"
+            name="Copy New Script">
       </command>
    </extension>
    <extension
@@ -536,6 +547,10 @@
       <handler
             class="hk.ust.cse.pishon.esgen.handlers.LoadScriptHandler"
             commandId="hk.ust.cse.pishon.esgen.commands.LoadScript">
+      </handler>
+      <handler
+            class="hk.ust.cse.pishon.esgen.handlers.CopyScriptHandler"
+            commandId="hk.ust.cse.pishon.esgen.commands.CopyScript">
       </handler>
    </extension>
    <extension
