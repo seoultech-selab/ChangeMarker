@@ -257,6 +257,10 @@ public class ChangeView extends ViewPart {
 		scripts.putIfAbsent(changeName, new Node(changeName));
 		return scripts.get(changeName);
 	}
+	
+	public void setScripts(String changeName, Node n) {
+		scripts.put(changeName, n);
+	}
 
 	public void setScripts(File f) {
 		scripts = (Map<String, Node>)readFile(f);
@@ -284,17 +288,7 @@ public class ChangeView extends ViewPart {
 				n.addChild(s);
 				//Sort by line, pos.
 				List<EditOp> editOps = script.getEditOps();
-				editOps.sort((op1, op2) -> {
-					int line1 = op1.getType().equals(EditOp.OP_INSERT) ? op1.getNewStartLine() : op1.getOldStartLine();
-					int line2 = op2.getType().equals(EditOp.OP_INSERT) ? op2.getNewStartLine() : op2.getOldStartLine();
-					int cmp = Integer.compare(line1, line2);
-					if(cmp == 0) {
-						int pos1 = op1.getType().equals(EditOp.OP_INSERT) ? op1.getNewStartPos() : op1.getOldStartPos();
-						int pos2 = op2.getType().equals(EditOp.OP_INSERT) ? op2.getNewStartPos() : op2.getOldStartPos();
-						cmp = Integer.compare(pos1, pos2);
-					}
-					return cmp;
-				});
+				editOps.sort(new EditOp.LinePosComparator());
 				for(EditOp op : editOps) {
 					op = op.trim();
 					s.addChild(new Node(op));

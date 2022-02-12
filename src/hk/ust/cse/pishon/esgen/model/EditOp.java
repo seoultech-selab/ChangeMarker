@@ -1,6 +1,9 @@
 package hk.ust.cse.pishon.esgen.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import org.eclipse.jface.text.ITextSelection;
 
@@ -197,7 +200,17 @@ public class EditOp implements Serializable, Comparable<EditOp> {
 			cmp = type.compareTo(op.type);
 		return cmp;
 	}
-
+	
+	@Override
+	public int hashCode() {
+		int hashCode = 1;
+		hashCode = 31 * hashCode + type.hashCode();
+		hashCode = 31 * hashCode + oldStartPos;
+		hashCode = 31 * hashCode + oldLength;
+		hashCode = 31 * hashCode + newStartPos;
+		hashCode = 31 * hashCode + newLength;
+		return hashCode;
+	}
 
 	public EditOp trim() {
 		EditOp op = new EditOp(this);
@@ -214,5 +227,20 @@ public class EditOp implements Serializable, Comparable<EditOp> {
 			op.newCode = op.newCode.trim();
 		}
 		return op;
+	}
+	
+	public static class LinePosComparator implements Comparator<EditOp> {
+		@Override
+		public int compare(EditOp op1, EditOp op2) {
+			int line1 = op1.getType().equals(EditOp.OP_INSERT) ? op1.getNewStartLine() : op1.getOldStartLine();
+			int line2 = op2.getType().equals(EditOp.OP_INSERT) ? op2.getNewStartLine() : op2.getOldStartLine();
+			int cmp = Integer.compare(line1, line2);
+			if(cmp == 0) {
+				int pos1 = op1.getType().equals(EditOp.OP_INSERT) ? op1.getNewStartPos() : op1.getOldStartPos();
+				int pos2 = op2.getType().equals(EditOp.OP_INSERT) ? op2.getNewStartPos() : op2.getOldStartPos();
+				cmp = Integer.compare(pos1, pos2);
+			}
+			return cmp;
+		}
 	}
 }

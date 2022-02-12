@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.resource.FontDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
@@ -41,13 +45,10 @@ public class ScriptView extends ViewPart {
 		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.getTable().setHeaderVisible(true);
 		viewer.getTable().setLinesVisible(true);
-		Font font = viewer.getTable().getFont();
-		FontData[] fontData = font.getFontData();
-		for(FontData fd : fontData)
-			fd.setHeight(12);
-		font = new Font(viewer.getTable().getDisplay(), fontData);
-		viewer.getTable().setFont(font);
 		viewer.setContentProvider(ArrayContentProvider.getInstance());
+		
+		ResourceManager resourceManager = new LocalResourceManager(JFaceResources.getResources(), parent);
+		viewer.getTable().setFont(resourceManager.createFont(FontDescriptor.createFrom("Courier", 12, SWT.NORMAL)));
 
 		TableViewerColumn colType = new TableViewerColumn(viewer, SWT.NONE);
 		colType.getColumn().setWidth(50);

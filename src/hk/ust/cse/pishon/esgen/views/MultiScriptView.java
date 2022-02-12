@@ -1,5 +1,11 @@
 package hk.ust.cse.pishon.esgen.views;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -40,8 +46,6 @@ public class MultiScriptView extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		ResourceManager resourceManager = new LocalResourceManager(JFaceResources.getResources(), parent);
-
 		viewer = new TreeViewer(parent);
 		viewer.setAutoExpandLevel(2);
 		viewer.getTree().setHeaderVisible(true);
@@ -76,7 +80,8 @@ public class MultiScriptView extends ViewPart {
 				return null;
 			}
 		});
-
+	
+		ResourceManager resourceManager = new LocalResourceManager(JFaceResources.getResources(), parent);
 		viewer.getTree().setFont(resourceManager.createFont(FontDescriptor.createFrom("Courier", 12, SWT.NORMAL)));
 
 		TreeViewerColumn colName = new TreeViewerColumn(viewer, SWT.NONE);
@@ -231,7 +236,6 @@ public class MultiScriptView extends ViewPart {
 
 			@Override
 			public void partActivated(IWorkbenchPartReference partRef) {
-				System.out.println(partRef.getId());
 				if(partRef.getId().equals("org.eclipse.compare.CompareEditor")){
 					updateInput(partRef);
 				}
@@ -242,7 +246,6 @@ public class MultiScriptView extends ViewPart {
 				if(input instanceof CompareInput){
 					Change change = ((CompareInput) input).getChange();
 					setInput(change.getName());
-					System.out.println(change.getName());
 				}
 			}
 		};
@@ -267,13 +270,7 @@ public class MultiScriptView extends ViewPart {
 		curr.addChild(new Node(op));
 		viewer.refresh();
 	}
-
-	public void createNewScript() {
-		int num = scripts != null ? scripts.size() : 0;
-		curr = new Node("Script"+num);
-		scripts.addChild(curr);
-	}
-
+	
 	public void removeEditOp(Node n) {
 		if(curr != null && n != null && n.value instanceof EditOp) {
 			n.getParent().children.remove(n);
@@ -331,6 +328,12 @@ public class MultiScriptView extends ViewPart {
 		scripts.children.add(newScript);
 		viewer.refresh();
 	}
+	
+	public void createNewScript() {
+		int num = scripts != null ? scripts.size() : 0;
+		curr = new Node("Script"+num);
+		scripts.addChild(curr);
+	}
 
 	public void removeScript(Node n) {
 		scripts.children.remove(n);
@@ -340,4 +343,36 @@ public class MultiScriptView extends ViewPart {
 		viewer.refresh();
 	}
 
+	public void combineScripts() {
+		Map<List<EditOp>, String> combined = new HashMap<>();
+		Comparator<EditOp> comparator = new EditOp.LinePosComparator();
+		for(Node n : scripts.children) {
+			List<EditOp> editOps = new ArrayList<>();
+			for(Node c : n.children) {
+				editOps.add((EditOp)c.value);
+			}
+			editOps.sort(comparator);
+			String scriptName = (String)n.value;
+			combined.compute(editOps, (k,v) -> v == null ? scriptName : String.join(",", v, scriptName));
+		}
+		Node newScripts = new Node(changeName);
+		combined.forEach((list, name) -> {
+			Node n = new Node(name);
+			for(EditOp op : list)
+				n.addChild(new Node(op));
+			newScripts.addChild(n);
+		});
+		newScripts.children.sort((Node n1, Node n2) -> 
+			((String)n1.value).compareTo((String)n2.value));
+		scripts = newScripts;
+		curr = scripts.children.get(0);
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		final IWorkbenchPage page = window.getActivePage();
+		ChangeView changeView = (ChangeView)page.findView(ChangeView.ID);
+		if(changeView != null) {
+			changeView.setScripts(changeName, newScripts);
+		}		
+		viewer.setInput(scripts);
+		viewer.getControl().redraw();
+	}
 }

@@ -82,7 +82,7 @@
             </command>
             <command
                   commandId="hk.ust.cse.pishon.esgen.commands.LoadScript"
-                  label="Load Script from a Stored File."
+                  label="Load Script from a Stored File"
                   style="push"
                   tooltip="Load Scripts from a stored file.">
             </command>
@@ -305,6 +305,17 @@
                tooltip="Copy the Selected Script.">
          </command>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:hk.ust.cse.pishon.esgen.views.multiscriptview">
+         <command
+               commandId="hk.ust.cse.pishon.esgen.commands.CombineScripts"
+               icon="icons/merge.png"
+               label="Combine Scripts"
+               style="push"
+               tooltip="Combine Identical Scripts">
+         </command>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -385,12 +396,12 @@
             name="Load Changes">
       </command>
       <command
-            description="Load Statistics from Existing Script Files."
+            description="Load Statistics from Existing Script Files"
             id="hk.ust.cse.pishon.esgen.commands.LoadScriptStat"
             name="Load Script Statistics">
       </command>
       <command
-            description="Copy Selected Edit Operations to Script."
+            description="Copy Selected Edit Operations to Script"
             id="hk.ust.cse.pishon.esgen.commands.Copy"
             name="Copy Selected">
       </command>
@@ -409,14 +420,19 @@
             name="Export All">
       </command>
       <command
-            description="Load Scripts from a stored file."
+            description="Load Scripts From a Stored File"
             id="hk.ust.cse.pishon.esgen.commands.LoadScriptStat"
             name="Load Script">
       </command>
       <command
-            description="Copy a new script."
+            description="Copy a new script"
             id="hk.ust.cse.pishon.esgen.commands.CopyScript"
             name="Copy New Script">
+      </command>
+      <command
+            description="Combine Identical Scripts"
+            id="hk.ust.cse.pishon.esgen.commands.CombineScripts"
+            name="Combine Scripts">
       </command>
    </extension>
    <extension
@@ -551,6 +567,10 @@
       <handler
             class="hk.ust.cse.pishon.esgen.handlers.CopyScriptHandler"
             commandId="hk.ust.cse.pishon.esgen.commands.CopyScript">
+       </handler>
+       <handler
+            class="hk.ust.cse.pishon.esgen.handlers.CombineScriptsHandler"
+            commandId="hk.ust.cse.pishon.esgen.commands.CombineScripts">
       </handler>
    </extension>
    <extension
