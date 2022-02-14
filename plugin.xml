@@ -266,6 +266,12 @@
                style="push"
                tooltip="Clear all edit operations in this script.">
          </command>
+         <command
+               commandId="hk.ust.cse.pishon.esgen.commands.Copy"
+               label="Copy Selected"
+               style="push"
+               tooltip="Copy Selected Edit Operations">
+         </command>
       </menuContribution>
       <menuContribution
             allPopups="false"
@@ -285,12 +291,6 @@
                label="Create New Script"
                style="push"
                tooltip="Create a new script for edit operations.">
-         </command>
-         <command
-               commandId="hk.ust.cse.pishon.esgen.commands.DeleteScript"
-               label="Delete Script"
-               style="push"
-               tooltip="Delete the Selected Script.">
          </command>
          <command
                commandId="hk.ust.cse.pishon.esgen.commands.DeleteOp"
