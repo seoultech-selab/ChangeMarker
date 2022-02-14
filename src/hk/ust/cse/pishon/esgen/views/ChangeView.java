@@ -288,7 +288,7 @@ public class ChangeView extends ViewPart {
 				n.addChild(s);
 				//Sort by line, pos.
 				List<EditOp> editOps = script.getEditOps();
-				editOps.sort(new EditOp.LinePosComparator());
+				editOps.sort((op1, op2) -> EditOp.compare(op1, op2));
 				for(EditOp op : editOps) {
 					op = op.trim();
 					s.addChild(new Node(op));

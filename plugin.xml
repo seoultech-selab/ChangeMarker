@@ -293,16 +293,34 @@
                tooltip="Create a new script for edit operations.">
          </command>
          <command
+               commandId="hk.ust.cse.pishon.esgen.commands.Copy"
+               label="Copy Selected"
+               style="push"
+               tooltip="Copy Selected Edit Operations">
+         </command>
+         <command
                commandId="hk.ust.cse.pishon.esgen.commands.DeleteOp"
                label="Delete Operation"
                style="push"
                tooltip="Delete selected edit operation.">
          </command>
          <command
-               commandId="hk.ust.cse.pishon.esgen.commands.CopyScript"
-               label="Copy Script"
-               style="push"
-               tooltip="Copy the Selected Script.">
+               commandId="hk.ust.cse.pishon.esgen.commands.ReplaceFromScript"
+               label="Replace - from Edit Script"
+               style="push">
+            <parameter
+                  name="hk.ust.cse.pishon.esgen.commands.repalce.viewId"
+                  value="hk.ust.cse.pishon.esgen.views.scriptview">
+            </parameter>
+         </command>
+         <command
+               commandId="hk.ust.cse.pishon.esgen.commands.ReplaceFromStat"
+               label="Replace - from Script Stat."
+               style="push">
+            <parameter
+                  name="hk.ust.cse.pishon.esgen.commands.repalce.viewId"
+                  value="hk.ust.cse.pishon.esgen.views.scriptstatview">
+            </parameter>
          </command>
       </menuContribution>
       <menuContribution
@@ -433,6 +451,28 @@
             description="Combine Identical Scripts"
             id="hk.ust.cse.pishon.esgen.commands.CombineScripts"
             name="Combine Scripts">
+      </command>
+      <command
+            defaultHandler="hk.ust.cse.pishon.esgen.handlers.ReplaceOpHandler"
+            id="hk.ust.cse.pishon.esgen.commands.ReplaceFromScript"
+            name="Replace from Edit Script">
+         <commandParameter
+               id="hk.ust.cse.pishon.esgen.commands.repalce.viewId"
+               name="ScriptView"
+               optional="true"
+               values="hk.ust.cse.pishon.esgen.views.scriptview">
+         </commandParameter>
+      </command>
+      <command
+            defaultHandler="hk.ust.cse.pishon.esgen.handlers.ReplaceOpHandler"
+            id="hk.ust.cse.pishon.esgen.commands.ReplaceFromStat"
+            name="Replace from Script Statistics">
+         <commandParameter
+               id="hk.ust.cse.pishon.esgen.commands.repalce.viewId"
+               name="ScriptStat"
+               optional="true"
+               values="hk.ust.cse.pishon.esgen.views.scriptstatview">
+         </commandParameter>
       </command>
    </extension>
    <extension

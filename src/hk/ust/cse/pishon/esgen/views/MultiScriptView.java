@@ -1,7 +1,6 @@
 package hk.ust.cse.pishon.esgen.views;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,7 +79,7 @@ public class MultiScriptView extends ViewPart {
 				return null;
 			}
 		});
-	
+
 		ResourceManager resourceManager = new LocalResourceManager(JFaceResources.getResources(), parent);
 		viewer.getTree().setFont(resourceManager.createFont(FontDescriptor.createFrom("Courier", 12, SWT.NORMAL)));
 
@@ -146,6 +145,40 @@ public class MultiScriptView extends ViewPart {
 			}
 		});
 
+		TreeViewerColumn colOldPos = new TreeViewerColumn(viewer, SWT.NONE);
+		colOldPos.getColumn().setWidth(50);
+		colOldPos.getColumn().setText("S.Pos.");
+		colOldPos.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				if(element instanceof Node) {
+					Node n = (Node)element;
+					if(n.value instanceof EditOp) {
+						int v = ((EditOp)n.value).getOldStartPos();
+						return v > 0 ? String.valueOf(v) : "";
+					}
+				}
+				return "";
+			}
+		});
+
+		TreeViewerColumn colOldLen = new TreeViewerColumn(viewer, SWT.NONE);
+		colOldLen.getColumn().setWidth(50);
+		colOldLen.getColumn().setText("Length");
+		colOldLen.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				if(element instanceof Node) {
+					Node n = (Node)element;
+					if(n.value instanceof EditOp) {
+						int v = ((EditOp)n.value).getOldLength();
+						return v > 0 ? String.valueOf(v) : "";
+					}
+				}
+				return "";
+			}
+		});
+
 		TreeViewerColumn colNewCode = new TreeViewerColumn(viewer, SWT.NONE);
 		colNewCode.getColumn().setWidth(200);
 		colNewCode.getColumn().setText("New Code");
@@ -172,6 +205,40 @@ public class MultiScriptView extends ViewPart {
 					if(n.value instanceof EditOp) {
 						int line = ((EditOp)n.value).getNewStartLine();
 						return line > 0 ? String.valueOf(line) : "";
+					}
+				}
+				return "";
+			}
+		});
+
+		TreeViewerColumn colNewPos = new TreeViewerColumn(viewer, SWT.NONE);
+		colNewPos.getColumn().setWidth(50);
+		colNewPos.getColumn().setText("S.Pos.");
+		colNewPos.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				if(element instanceof Node) {
+					Node n = (Node)element;
+					if(n.value instanceof EditOp) {
+						int v = ((EditOp)n.value).getNewStartPos();
+						return v > 0 ? String.valueOf(v) : "";
+					}
+				}
+				return "";
+			}
+		});
+
+		TreeViewerColumn colNewLen = new TreeViewerColumn(viewer, SWT.NONE);
+		colNewLen.getColumn().setWidth(50);
+		colNewLen.getColumn().setText("Length");
+		colNewLen.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				if(element instanceof Node) {
+					Node n = (Node)element;
+					if(n.value instanceof EditOp) {
+						int v = ((EditOp)n.value).getNewLength();
+						return v > 0 ? String.valueOf(v) : "";
 					}
 				}
 				return "";
@@ -264,13 +331,19 @@ public class MultiScriptView extends ViewPart {
 		viewer.refresh();
 	}
 
+	public void addEditOp(Node n, EditOp op){
+		curr = n;
+		addEditOp(op);
+	}
+
 	public void addEditOp(EditOp op){
 		if(curr == null)
 			createNewScript();
 		curr.addChild(new Node(op));
+		curr.children.sort((n1, n2) -> EditOp.compare((EditOp)n1.value, (EditOp)n2.value));
 		viewer.refresh();
 	}
-	
+
 	public void removeEditOp(Node n) {
 		if(curr != null && n != null && n.value instanceof EditOp) {
 			n.getParent().children.remove(n);
@@ -311,7 +384,7 @@ public class MultiScriptView extends ViewPart {
 				if(n != null)
 					scripts = n;
 			}
-			curr = scripts.hasChildren() ? scripts.children.get(0) : null;
+			curr = scripts.hasChildren() ? scripts.children.get(0) : curr;
 		}
 		viewer.setInput(scripts);
 		viewer.getControl().redraw();
@@ -321,14 +394,14 @@ public class MultiScriptView extends ViewPart {
 		scripts = null;
 		viewer.refresh();
 	}
-	
+
 	public void addScript(Node n) {
 		Node newScript = n.copy();
 		n.value = "Script"+scripts.children.size();
 		scripts.children.add(newScript);
 		viewer.refresh();
 	}
-	
+
 	public void createNewScript() {
 		int num = scripts != null ? scripts.size() : 0;
 		curr = new Node("Script"+num);
@@ -345,13 +418,12 @@ public class MultiScriptView extends ViewPart {
 
 	public void combineScripts() {
 		Map<List<EditOp>, String> combined = new HashMap<>();
-		Comparator<EditOp> comparator = new EditOp.LinePosComparator();
 		for(Node n : scripts.children) {
 			List<EditOp> editOps = new ArrayList<>();
 			for(Node c : n.children) {
 				editOps.add((EditOp)c.value);
 			}
-			editOps.sort(comparator);
+			editOps.sort((op1, op2) -> EditOp.compare(op1, op2));
 			String scriptName = (String)n.value;
 			combined.compute(editOps, (k,v) -> v == null ? scriptName : String.join(",", v, scriptName));
 		}
@@ -362,8 +434,8 @@ public class MultiScriptView extends ViewPart {
 				n.addChild(new Node(op));
 			newScripts.addChild(n);
 		});
-		newScripts.children.sort((Node n1, Node n2) -> 
-			((String)n1.value).compareTo((String)n2.value));
+		newScripts.children.sort((Node n1, Node n2) ->
+		((String)n1.value).compareTo((String)n2.value));
 		scripts = newScripts;
 		curr = scripts.children.get(0);
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -371,7 +443,7 @@ public class MultiScriptView extends ViewPart {
 		ChangeView changeView = (ChangeView)page.findView(ChangeView.ID);
 		if(changeView != null) {
 			changeView.setScripts(changeName, newScripts);
-		}		
+		}
 		viewer.setInput(scripts);
 		viewer.getControl().redraw();
 	}
