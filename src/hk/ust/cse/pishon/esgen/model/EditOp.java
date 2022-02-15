@@ -1,9 +1,6 @@
 package hk.ust.cse.pishon.esgen.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 
 import org.eclipse.jface.text.ITextSelection;
 
@@ -63,7 +60,23 @@ public class EditOp implements Serializable, Comparable<EditOp> {
 		this.newEndLine = op.newEndLine;
 	}
 
-
+	public EditOp(String type, int startPos, int len, int startLine, int endLine, String code) {
+		if(type != null && type.equals(OP_INSERT)) {
+			this.type = type;
+			this.newStartPos = startPos;
+			this.newLength = len;
+			this.newStartLine = startLine;
+			this.newEndLine = endLine;
+			this.newCode = code;
+		} else {
+			this.type = type;
+			this.oldStartPos = startPos;
+			this.oldLength = len;
+			this.oldStartLine = startLine;
+			this.oldEndLine = endLine;
+			this.oldCode = code;
+		}
+	}
 
 	public String getType() {
 		return type;
@@ -172,7 +185,7 @@ public class EditOp implements Serializable, Comparable<EditOp> {
 		}
 		return false;
 	}
-	
+
 	public static int compare(EditOp op1, EditOp op2) {
 		int line1 = op1.getType().equals(EditOp.OP_INSERT) ? op1.getNewStartLine() : op1.getOldStartLine();
 		int line2 = op2.getType().equals(EditOp.OP_INSERT) ? op2.getNewStartLine() : op2.getOldStartLine();
@@ -212,7 +225,7 @@ public class EditOp implements Serializable, Comparable<EditOp> {
 			cmp = type.compareTo(op.type);
 		return cmp;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		int hashCode = 1;
@@ -226,17 +239,21 @@ public class EditOp implements Serializable, Comparable<EditOp> {
 
 	public EditOp trim() {
 		EditOp op = new EditOp(this);
-		if(op.oldCode != null && op.oldCode.length() > op.oldCode.trim().length()) {
-			int len = op.oldCode.length();
-			op.oldStartPos += len - op.oldCode.stripLeading().length();
-			op.oldLength -= len - op.oldCode.stripTrailing().length();
-			op.oldCode = op.oldCode.trim();
+		if(op.oldCode != null) {
+			String trimmed = op.oldCode.trim();
+			if(op.oldCode.length() > trimmed.length()) {
+				op.oldStartPos += op.oldCode.length() - op.oldCode.stripLeading().length();
+				op.oldLength = trimmed.length();
+				op.oldCode = trimmed;
+			}
 		}
-		if(op.newCode != null && op.newCode.length() > op.newCode.trim().length()) {
-			int len = op.newCode.length();
-			op.newStartPos += len - op.newCode.stripLeading().length();
-			op.newLength -= len - op.newCode.stripTrailing().length();
-			op.newCode = op.newCode.trim();
+		if(op.newCode != null) {
+			String trimmed = op.newCode.trim();
+			if(op.newCode.length() > trimmed.length()) {
+				op.newStartPos += op.newCode.length() - op.newCode.stripLeading().length();
+				op.newLength = trimmed.length();
+				op.newCode = trimmed;
+			}
 		}
 		return op;
 	}

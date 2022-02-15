@@ -14,7 +14,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorInput;
@@ -194,7 +193,7 @@ public class ScriptStatView extends ViewPart {
 			}
 		});
 		viewer.setInput(stat.keySet());
-		
+
 		ResourceManager resourceManager = new LocalResourceManager(JFaceResources.getResources(), parent);
 		viewer.getTable().setFont(resourceManager.createFont(FontDescriptor.createFrom("Courier", 12, SWT.NORMAL)));
 
@@ -265,9 +264,9 @@ public class ScriptStatView extends ViewPart {
 		} else {
 			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 			final IWorkbenchPage page = window.getActivePage();
-			ScriptList scriptList = (ScriptList)page.findView(ScriptList.ID);
-			if(scriptList != null)
-				setStat(scriptList.getStat(changeName));
+			ChangeView changeView = (ChangeView)page.findView(ChangeView.ID);
+			if(changeView != null)
+				setStat(changeView.getStat(changeName));
 		}
 		viewer.getControl().redraw();
 	}

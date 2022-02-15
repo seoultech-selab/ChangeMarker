@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.eclipse.compare.CompareUI;
 import org.eclipse.core.resources.IWorkspace;
@@ -48,6 +49,9 @@ import hk.ust.cse.pishon.esgen.model.EditOp;
 import hk.ust.cse.pishon.esgen.model.EditScript;
 import hk.ust.cse.pishon.esgen.model.Node;
 import hk.ust.cse.pishon.esgen.model.ScriptItem;
+import hk.ust.cse.pishon.esgen.tree.Tree;
+import hk.ust.cse.pishon.esgen.tree.TreeBuilder;
+import hk.ust.cse.pishon.esgen.tree.TreeNode;
 
 public class ChangeView extends ViewPart {
 	public static final String ID = "hk.ust.cse.pishon.esgen.views.changeview";
@@ -57,6 +61,9 @@ public class ChangeView extends ViewPart {
 	private TableViewer viewer;
 	private List<Change> changes;
 	private Map<String, Node> scripts;
+	private Map<String, TreeMap<EditOp, List<String>>> statMap = new HashMap<>();
+	private Map<String, Tree> oldTrees = new HashMap<>();
+	private Map<String, Tree> newTrees = new HashMap<>();
 	private String changePath;
 
 	public String getChangePath() {
@@ -257,7 +264,7 @@ public class ChangeView extends ViewPart {
 		scripts.putIfAbsent(changeName, new Node(changeName));
 		return scripts.get(changeName);
 	}
-	
+
 	public void setScripts(String changeName, Node n) {
 		scripts.put(changeName, n);
 	}
@@ -280,21 +287,23 @@ public class ChangeView extends ViewPart {
 				targetChanges.add(changeName);
 		}
 
-		for(String changeName : targetChanges) {
-			Node n = scripts.get(changeName);
-			for(ScriptItem item : items) {
-				EditScript script = item.changes.get(changeName).getScript();
-				Node s = new Node(item.fileName);
-				n.addChild(s);
-				//Sort by line, pos.
-				List<EditOp> editOps = script.getEditOps();
-				editOps.sort((op1, op2) -> EditOp.compare(op1, op2));
-				for(EditOp op : editOps) {
-					op = op.trim();
-					s.addChild(new Node(op));
-				}
-			}
-		}
+		updateScripts(items, targetChanges);
+		//
+		//		for(String changeName : targetChanges) {
+		//			Node n = scripts.get(changeName);
+		//			for(ScriptItem item : items) {
+		//				EditScript script = item.changes.get(changeName).getScript();
+		//				Node s = new Node(item.fileName);
+		//				n.addChild(s);
+		//				//Sort by line, pos.
+		//				List<EditOp> editOps = script.getEditOps();
+		//				editOps.sort((op1, op2) -> EditOp.compare(op1, op2));
+		//				for(EditOp op : editOps) {
+		//					op = op.trim();
+		//					s.addChild(new Node(op));
+		//				}
+		//			}
+		//		}
 	}
 
 	private void readSaved() {
@@ -405,5 +414,122 @@ public class ChangeView extends ViewPart {
 				return f;
 		}
 		return null;
+	}
+
+	private void updateScripts(List<ScriptItem> items, Set<String> targetChanges) {
+		statMap.clear();
+		for(String changeName : targetChanges) {
+			statMap.putIfAbsent(changeName, new TreeMap<EditOp, List<String>>());
+			TreeMap<EditOp, List<String>> stat = statMap.get(changeName);
+			Node n = scripts.get(changeName);
+
+			for(ScriptItem item : items) {
+				Change c = item.changes.get(changeName);
+				oldTrees.putIfAbsent(changeName, TreeBuilder.buildTree(c.getOldFile().getContent()));
+				newTrees.putIfAbsent(changeName, TreeBuilder.buildTree(c.getNewFile().getContent()));
+				EditScript script = c.getScript();
+				List<EditOp> editOps =  new ArrayList<>();
+				for(EditOp op : script.getEditOps()) {
+					op = op.trim();
+					//					List<EditOp> ops = slice(op, changeName, c);
+					//					editOps.addAll(ops);
+					editOps.add(op);
+				}
+
+				Node s = new Node(item.fileName);
+				n.addChild(s);
+				//Sort by line, pos.
+				editOps.sort((op1, op2) -> EditOp.compare(op1, op2));
+
+				//Update stat., add node.
+				for(EditOp op : editOps) {
+					s.addChild(new Node(op));
+					stat.putIfAbsent(op, new ArrayList<String>());
+					stat.get(op).add(item.fileName);
+				}
+			}
+		}
+	}
+
+	private static final int FULLY_INCLD = 0;
+	private static final int POSTFIX_INCLD = 1;
+	private static final int PREFIX_INCLD = 2;
+	private static final int NOT_INCLD = 3;
+
+	private int checkOverlap(TreeNode n, int startPos, int endPos) {
+		if(n.startPos >= startPos && n.endPos <= endPos) {
+			return FULLY_INCLD;
+		}else if(n.startPos < startPos && n.endPos > startPos && n.endPos < endPos) {
+			return POSTFIX_INCLD;
+		}else if(n.startPos < endPos && n.startPos > startPos && n.endPos > endPos) {
+			return PREFIX_INCLD;
+		}
+		return NOT_INCLD;
+	}
+
+	private List<EditOp> slice(EditOp op, String changeName, Change change) {
+		List<EditOp> ops = new ArrayList<>();
+		Tree t = null;
+		TreeNode n = null;
+		int startPos = -1;
+		int len = 0;
+		int sLine = 0;
+		int eLine = 0;
+		String code = null;
+
+		//Only slice insert/delete operations.
+		if(op.getType().equals(EditOp.OP_INSERT)) {
+			startPos = op.getNewStartPos();
+			len = op.getNewLength();
+			sLine = op.getNewStartLine();
+			eLine = op.getNewEndLine();
+			code = op.getNewCode();
+			t = newTrees.get(changeName);
+		} else if(op.getType().equals(EditOp.OP_DELETE)) {
+			startPos = op.getOldStartPos();
+			len = op.getOldLength();
+			sLine = op.getOldStartLine();
+			eLine = op.getOldEndLine();
+			code = op.getOldCode();
+			t = oldTrees.get(changeName);
+		}
+		if(t != null && startPos >= 0 && len > 0 && code != null) {
+			n = t.getNode(startPos, len);
+			if(n != null) {
+				int endPos = startPos + len;
+				if(n.startPos == startPos && n.endPos == endPos) {
+					ops.add(op);
+					return ops;
+				}
+
+				int cLen = 0;
+				for(TreeNode c : n.children) {
+					switch(checkOverlap(c, startPos, endPos)) {
+					case FULLY_INCLD:
+						cLen = c.endPos - c.startPos;
+						ops.add(new EditOp(op.getType(), c.startPos, cLen,
+								c.startLine, c.endLine, code.substring(c.startPos - startPos, c.endPos - startPos)));
+						break;
+					case POSTFIX_INCLD:
+						cLen = c.endPos - startPos;
+						ops.add(new EditOp(op.getType(), startPos, cLen,
+								sLine, c.endLine, code.substring(0, cLen)));
+						break;
+					case PREFIX_INCLD:
+						cLen = endPos - c.startPos;
+						ops.add(new EditOp(op.getType(), c.startPos, cLen,
+								c.startLine, eLine, code.substring(c.startPos - startPos)));
+						break;
+					}
+				}
+			}
+		}
+		if(ops.size() == 0)
+			ops.add(op);
+		return ops;
+	}
+
+	public TreeMap<EditOp, List<String>> getStat(String changeName) {
+		return statMap.get(changeName);
 	}
 }

@@ -2,10 +2,7 @@ package hk.ust.cse.pishon.esgen.views;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -21,8 +18,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
-import hk.ust.cse.pishon.esgen.model.EditOp;
-import hk.ust.cse.pishon.esgen.model.EditScript;
 import hk.ust.cse.pishon.esgen.model.ScriptItem;
 
 public class ScriptList extends ViewPart {
@@ -30,7 +25,6 @@ public class ScriptList extends ViewPart {
 	public static final String METADATA_PATH = ".metadata" + File.separator + "changemarker";
 	private TableViewer viewer;
 	private List<ScriptItem> scripts;
-	private Map<String, TreeMap<EditOp, List<String>>> statMap = new HashMap<>();
 	private ScriptItem opened = null;
 
 	class ViewLabelProvider extends LabelProvider  {
@@ -120,31 +114,11 @@ public class ScriptList extends ViewPart {
 	public void setInput(List<ScriptItem> newInput){
 		scripts.clear();
 		scripts.addAll(newInput);
-		updateStatMap();
 		viewer.setInput(scripts);
-	}
-
-	private void updateStatMap() {
-		statMap.clear();
-		for(ScriptItem item : scripts) {
-			for(String chgName : item.changes.keySet()) {
-				statMap.putIfAbsent(chgName, new TreeMap<EditOp, List<String>>());
-				TreeMap<EditOp, List<String>> stat = statMap.get(chgName);
-				EditScript script = item.changes.get(chgName).getScript();
-				for(EditOp op : script.getEditOps()) {
-					op = op.trim();
-					stat.putIfAbsent(op, new ArrayList<String>());
-					stat.get(op).add(item.fileName);
-				}
-			}
-		}
 	}
 
 	public List<ScriptItem> getInput(){
 		List<ScriptItem> scripts = new ArrayList<ScriptItem>(this.scripts);
 		return scripts;
-	}
-	public TreeMap<EditOp, List<String>> getStat(String changeName) {
-		return statMap.get(changeName);
 	}
 }

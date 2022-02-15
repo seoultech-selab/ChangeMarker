@@ -64,4 +64,8 @@ public class CompareItem implements ITypedElement, IStreamContentAccessor, Seria
 	public String getType() {
 		return "change";
 	}
+
+	public String getContent() {
+		return content;
+	}
 }

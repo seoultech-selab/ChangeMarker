@@ -130,7 +130,7 @@ public class MultiScriptView extends ViewPart {
 
 		TreeViewerColumn colOldLine = new TreeViewerColumn(viewer, SWT.NONE);
 		colOldLine.getColumn().setWidth(50);
-		colOldLine.getColumn().setText("Line#");
+		colOldLine.getColumn().setText("S.Line#");
 		colOldLine.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -139,6 +139,23 @@ public class MultiScriptView extends ViewPart {
 					if(n.value instanceof EditOp) {
 						int line = ((EditOp)n.value).getOldStartLine();
 						return line > 0 ? String.valueOf(line) : "";
+					}
+				}
+				return "";
+			}
+		});
+
+		TreeViewerColumn colOldEndLine = new TreeViewerColumn(viewer, SWT.NONE);
+		colOldEndLine.getColumn().setWidth(50);
+		colOldEndLine.getColumn().setText("E.Line#");
+		colOldEndLine.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				if(element instanceof Node) {
+					Node n = (Node)element;
+					if(n.value instanceof EditOp) {
+						int v = ((EditOp)n.value).getOldEndLine();
+						return v > 0 ? String.valueOf(v) : "";
 					}
 				}
 				return "";
@@ -155,23 +172,6 @@ public class MultiScriptView extends ViewPart {
 					Node n = (Node)element;
 					if(n.value instanceof EditOp) {
 						int v = ((EditOp)n.value).getOldStartPos();
-						return v > 0 ? String.valueOf(v) : "";
-					}
-				}
-				return "";
-			}
-		});
-
-		TreeViewerColumn colOldLen = new TreeViewerColumn(viewer, SWT.NONE);
-		colOldLen.getColumn().setWidth(50);
-		colOldLen.getColumn().setText("Length");
-		colOldLen.setLabelProvider(new ColumnLabelProvider() {
-			@Override
-			public String getText(Object element) {
-				if(element instanceof Node) {
-					Node n = (Node)element;
-					if(n.value instanceof EditOp) {
-						int v = ((EditOp)n.value).getOldLength();
 						return v > 0 ? String.valueOf(v) : "";
 					}
 				}
@@ -196,7 +196,7 @@ public class MultiScriptView extends ViewPart {
 
 		TreeViewerColumn colNewLine = new TreeViewerColumn(viewer, SWT.NONE);
 		colNewLine.getColumn().setWidth(50);
-		colNewLine.getColumn().setText("Line#");
+		colNewLine.getColumn().setText("S.Line#");
 		colNewLine.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -205,6 +205,23 @@ public class MultiScriptView extends ViewPart {
 					if(n.value instanceof EditOp) {
 						int line = ((EditOp)n.value).getNewStartLine();
 						return line > 0 ? String.valueOf(line) : "";
+					}
+				}
+				return "";
+			}
+		});
+
+		TreeViewerColumn colNewEndLine = new TreeViewerColumn(viewer, SWT.NONE);
+		colNewEndLine.getColumn().setWidth(50);
+		colNewEndLine.getColumn().setText("E.Line#");
+		colNewEndLine.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				if(element instanceof Node) {
+					Node n = (Node)element;
+					if(n.value instanceof EditOp) {
+						int v = ((EditOp)n.value).getNewEndLine();
+						return v > 0 ? String.valueOf(v) : "";
 					}
 				}
 				return "";
@@ -228,22 +245,6 @@ public class MultiScriptView extends ViewPart {
 			}
 		});
 
-		TreeViewerColumn colNewLen = new TreeViewerColumn(viewer, SWT.NONE);
-		colNewLen.getColumn().setWidth(50);
-		colNewLen.getColumn().setText("Length");
-		colNewLen.setLabelProvider(new ColumnLabelProvider() {
-			@Override
-			public String getText(Object element) {
-				if(element instanceof Node) {
-					Node n = (Node)element;
-					if(n.value instanceof EditOp) {
-						int v = ((EditOp)n.value).getNewLength();
-						return v > 0 ? String.valueOf(v) : "";
-					}
-				}
-				return "";
-			}
-		});
 		viewer.setInput(scripts);
 
 		//Double-click to select a script.
