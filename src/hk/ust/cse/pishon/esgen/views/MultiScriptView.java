@@ -45,7 +45,7 @@ public class MultiScriptView extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		viewer = new TreeViewer(parent);
+		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
 		viewer.setAutoExpandLevel(2);
 		viewer.getTree().setHeaderVisible(true);
 		viewer.getTree().setLinesVisible(true);
@@ -83,7 +83,7 @@ public class MultiScriptView extends ViewPart {
 		ResourceManager resourceManager = new LocalResourceManager(JFaceResources.getResources(), parent);
 		viewer.getTree().setFont(resourceManager.createFont(FontDescriptor.createFrom("Courier", 12, SWT.NORMAL)));
 
-		TreeViewerColumn colName = new TreeViewerColumn(viewer, SWT.NONE);
+		TreeViewerColumn colName = new TreeViewerColumn(viewer, SWT.LEFT);
 		colName.getColumn().setWidth(80);
 		colName.getColumn().setText("Name");
 		colName.setLabelProvider(new ColumnLabelProvider() {
@@ -98,7 +98,7 @@ public class MultiScriptView extends ViewPart {
 			}
 		});
 
-		TreeViewerColumn colType = new TreeViewerColumn(viewer, SWT.NONE);
+		TreeViewerColumn colType = new TreeViewerColumn(viewer, SWT.LEFT);
 		colType.getColumn().setWidth(50);
 		colType.getColumn().setText("Type");
 		colType.setLabelProvider(new ColumnLabelProvider() {
@@ -113,7 +113,7 @@ public class MultiScriptView extends ViewPart {
 			}
 		});
 
-		TreeViewerColumn colOldCode = new TreeViewerColumn(viewer, SWT.NONE);
+		TreeViewerColumn colOldCode = new TreeViewerColumn(viewer, SWT.LEFT);
 		colOldCode.getColumn().setWidth(200);
 		colOldCode.getColumn().setText("Old Code");
 		colOldCode.setLabelProvider(new ColumnLabelProvider() {
@@ -128,7 +128,7 @@ public class MultiScriptView extends ViewPart {
 			}
 		});
 
-		TreeViewerColumn colOldLine = new TreeViewerColumn(viewer, SWT.NONE);
+		TreeViewerColumn colOldLine = new TreeViewerColumn(viewer, SWT.RIGHT);
 		colOldLine.getColumn().setWidth(50);
 		colOldLine.getColumn().setText("S.Line#");
 		colOldLine.setLabelProvider(new ColumnLabelProvider() {
@@ -145,7 +145,7 @@ public class MultiScriptView extends ViewPart {
 			}
 		});
 
-		TreeViewerColumn colOldEndLine = new TreeViewerColumn(viewer, SWT.NONE);
+		TreeViewerColumn colOldEndLine = new TreeViewerColumn(viewer, SWT.RIGHT);
 		colOldEndLine.getColumn().setWidth(50);
 		colOldEndLine.getColumn().setText("E.Line#");
 		colOldEndLine.setLabelProvider(new ColumnLabelProvider() {
@@ -162,7 +162,7 @@ public class MultiScriptView extends ViewPart {
 			}
 		});
 
-		TreeViewerColumn colOldPos = new TreeViewerColumn(viewer, SWT.NONE);
+		TreeViewerColumn colOldPos = new TreeViewerColumn(viewer, SWT.RIGHT);
 		colOldPos.getColumn().setWidth(50);
 		colOldPos.getColumn().setText("S.Pos.");
 		colOldPos.setLabelProvider(new ColumnLabelProvider() {
@@ -179,7 +179,7 @@ public class MultiScriptView extends ViewPart {
 			}
 		});
 
-		TreeViewerColumn colNewCode = new TreeViewerColumn(viewer, SWT.NONE);
+		TreeViewerColumn colNewCode = new TreeViewerColumn(viewer, SWT.LEFT);
 		colNewCode.getColumn().setWidth(200);
 		colNewCode.getColumn().setText("New Code");
 		colNewCode.setLabelProvider(new ColumnLabelProvider() {
@@ -194,7 +194,7 @@ public class MultiScriptView extends ViewPart {
 			}
 		});
 
-		TreeViewerColumn colNewLine = new TreeViewerColumn(viewer, SWT.NONE);
+		TreeViewerColumn colNewLine = new TreeViewerColumn(viewer, SWT.RIGHT);
 		colNewLine.getColumn().setWidth(50);
 		colNewLine.getColumn().setText("S.Line#");
 		colNewLine.setLabelProvider(new ColumnLabelProvider() {
@@ -211,7 +211,7 @@ public class MultiScriptView extends ViewPart {
 			}
 		});
 
-		TreeViewerColumn colNewEndLine = new TreeViewerColumn(viewer, SWT.NONE);
+		TreeViewerColumn colNewEndLine = new TreeViewerColumn(viewer, SWT.RIGHT);
 		colNewEndLine.getColumn().setWidth(50);
 		colNewEndLine.getColumn().setText("E.Line#");
 		colNewEndLine.setLabelProvider(new ColumnLabelProvider() {
@@ -228,7 +228,7 @@ public class MultiScriptView extends ViewPart {
 			}
 		});
 
-		TreeViewerColumn colNewPos = new TreeViewerColumn(viewer, SWT.NONE);
+		TreeViewerColumn colNewPos = new TreeViewerColumn(viewer, SWT.RIGHT);
 		colNewPos.getColumn().setWidth(50);
 		colNewPos.getColumn().setText("S.Pos.");
 		colNewPos.setLabelProvider(new ColumnLabelProvider() {
