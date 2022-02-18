@@ -94,7 +94,7 @@ public class MultiScriptView extends ViewPart {
 					if(n.value instanceof String)
 						return n ==  curr ? n.value + " - current" : (String)n.value;
 				}
-				return "";
+				return "               ";
 			}
 		});
 

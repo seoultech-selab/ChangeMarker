@@ -431,8 +431,8 @@ public class ChangeView extends ViewPart {
 				List<EditOp> editOps =  new ArrayList<>();
 				for(EditOp op : script.getEditOps()) {
 					op = op.trim();
-					//					List<EditOp> ops = slice(op, changeName, c);
-					//					editOps.addAll(ops);
+					List<EditOp> ops = slice(op, changeName, c);
+					editOps.addAll(ops);
 					editOps.add(op);
 				}
 

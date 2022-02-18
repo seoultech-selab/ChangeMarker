@@ -13,8 +13,6 @@
       </vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts -Xdock:icon=../Resources/document.icns
       </vmArgsMac>
-      <vmArgsWin>-vm ./jre/bin
-      </vmArgsWin>
    </launcherArgs>
 
    <windowImages/>
