@@ -1,15 +1,11 @@
 package hk.ust.cse.pishon.esgen.handlers;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.List;
-import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -23,11 +19,10 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import hk.ust.cse.pishon.esgen.model.Change;
-import hk.ust.cse.pishon.esgen.model.Node;
+import hk.ust.cse.pishon.esgen.model.ScriptData;
 import hk.ust.cse.pishon.esgen.views.ChangeView;
 
-public class ExportAllHandler extends AbstractHandler {
+public class ExportScriptDataHandler extends AbstractHandler {
 
 	private static final String ERROR_DIALOG_TITLE = "Save Error";
 
@@ -37,12 +32,12 @@ public class ExportAllHandler extends AbstractHandler {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 		IWorkbenchPage page = window.getActivePage();
 		IViewPart changeView = page.findView(ChangeView.ID);
-		Map<String, Node> scripts= null;
 		if(changeView != null){
-			scripts = ((ChangeView)changeView).getAllScripts();
+			ScriptData data = ((ChangeView)changeView).getScriptData();
 			FileDialog dialog = new FileDialog(shell, SWT.SAVE);
-			dialog.setFileName("scripts.obj");
-			dialog.setText("Input file name to store edit scripts.");
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			dialog.setFileName(dtf.format(LocalDateTime.now())+".cmdata");
+			dialog.setText("Input file name to store ChangeMarker script data.");
 			String name = dialog.open();
 			if(name == null){
 				MessageDialog.openError(shell, ERROR_DIALOG_TITLE, "No file name is selected.");
@@ -51,10 +46,10 @@ public class ExportAllHandler extends AbstractHandler {
 				if(f.exists()){
 					boolean overwrite = MessageDialog.openConfirm(shell, "Overwrite", "This command will overwrite the current file. Proceed?");
 					if(overwrite){
-						saveTo(f, scripts);
+						saveTo(f, data);
 					}
 				}else{
-					saveTo(f, scripts);
+					saveTo(f, data);
 				}
 			}
 		}else{
@@ -63,11 +58,11 @@ public class ExportAllHandler extends AbstractHandler {
 		return null;
 	}
 
-	private void saveTo(File f, Map<String, Node> scripts) {
+	private void saveTo(File f, ScriptData data) {
 		ObjectOutputStream oos = null;
 		try {
 			oos = new ObjectOutputStream(new FileOutputStream(f));
-			oos.writeObject(scripts);
+			oos.writeObject(data);
 			oos.flush();
 		} catch (IOException e) {
 			e.printStackTrace();

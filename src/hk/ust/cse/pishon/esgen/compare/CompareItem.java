@@ -44,6 +44,11 @@ public class CompareItem implements ITypedElement, IStreamContentAccessor, Seria
 		}
 		content = sb.toString();
 	}
+	
+	public CompareItem(File f, String content) {
+		this.f = f;
+		this.content = content;
+	}
 
 	@Override
 	public InputStream getContents() throws CoreException {
@@ -67,5 +72,9 @@ public class CompareItem implements ITypedElement, IStreamContentAccessor, Seria
 
 	public String getContent() {
 		return content;
+	}
+	
+	public CompareItem copy() {
+		return new CompareItem(f, content);
 	}
 }

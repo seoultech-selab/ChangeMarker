@@ -35,12 +35,6 @@
             name="Edit Script">
       </view>
       <view
-            class="hk.ust.cse.pishon.esgen.views.ScriptStatView"
-            icon="icons/templates.png"
-            id="hk.ust.cse.pishon.esgen.views.scriptstatview"
-            name="Script Statistics">
-      </view>
-      <view
             allowMultiple="false"
             class="hk.ust.cse.pishon.esgen.views.ScriptList"
             icon="icons/package.png"
@@ -75,16 +69,28 @@
                   tooltip="Load Changes from a Selected Directory">
             </command>
             <command
-                  commandId="hk.ust.cse.pishon.esgen.commands.LoadScriptStat"
-                  label="Load Script Statistics"
+                  commandId="hk.ust.cse.pishon.esgen.commands.LoadMultiObjFiles"
+                  label="Load Multiple Script Files"
                   style="push"
-                  tooltip="Load Existing Edit Scripts">
+                  tooltip="Load Edit Scripts from Multiple Files.">
             </command>
             <command
                   commandId="hk.ust.cse.pishon.esgen.commands.LoadScript"
                   label="Load Script from a Stored File"
                   style="push"
                   tooltip="Load Scripts from a stored file.">
+            </command>
+            <command
+                  commandId="hk.ust.cse.pishon.esgen.commands.LoadScriptData"
+                  label="Load Script Data"
+                  style="push"
+                  tooltip="Load Script Data from a .cmdata file.">
+            </command>
+            <command
+                  commandId="hk.ust.cse.pishon.esgen.commands.LoadWebScript"
+                  label="Load ChangeMarker-Web Scripts"
+                  style="push"
+                  tooltip="Load ChangeMarker-Web Scripts">
             </command>
             <separator
                   name="hk.ust.cse.pishon.esgen.separator1"
@@ -97,10 +103,10 @@
                   tooltip="Export edit scripts for all changes.">
             </command>
             <command
-                  commandId="hk.ust.cse.pishon.esgen.commands.ExportAll"
-                  label="Export All Edit Scripts"
+                  commandId="hk.ust.cse.pishon.esgen.commands.ExportScriptData"
+                  label="Export ChangeMarker Script Data"
                   style="push"
-                  tooltip="Export all the edit scripts in Multi Script View into a file.">
+                  tooltip="Export All ChangeMarker Script Data.">
             </command>
             <separator
                   name="hk.ust.cse.pishon.esgen.separator1"
@@ -414,9 +420,9 @@
             name="Load Changes">
       </command>
       <command
-            description="Load Statistics from Existing Script Files"
-            id="hk.ust.cse.pishon.esgen.commands.LoadScriptStat"
-            name="Load Script Statistics">
+            description="Load Scripts from multiple obj files."
+            id="hk.ust.cse.pishon.esgen.commands.LoadMultiObjFiles"
+            name="Load Multiple Scripts Obj Files">
       </command>
       <command
             description="Copy Selected Edit Operations to Script"
@@ -434,12 +440,12 @@
             name="Delete Script">
       </command>
       <command
-            id="hk.ust.cse.pishon.esgen.commands.ExportAll"
-            name="Export All">
+            id="hk.ust.cse.pishon.esgen.commands.ExportScriptData"
+            name="Export ChangeMarker Script Data">
       </command>
       <command
             description="Load Scripts From a Stored File"
-            id="hk.ust.cse.pishon.esgen.commands.LoadScriptStat"
+            id="hk.ust.cse.pishon.esgen.commands.LoadScript"
             name="Load Script">
       </command>
       <command
@@ -473,6 +479,15 @@
                optional="true"
                values="hk.ust.cse.pishon.esgen.views.scriptstatview">
          </commandParameter>
+      </command>
+      <command
+            description="Load Script Data from a .cmdata file."
+            id="hk.ust.cse.pishon.esgen.commands.LoadScriptData"
+            name="Load Script Data">
+      </command>
+      <command
+            id="hk.ust.cse.pishon.esgen.commands.LoadWebScript"
+            name="Load Scripts from ChangeMarker-Web Data.">
       </command>
    </extension>
    <extension
@@ -581,8 +596,8 @@
             commandId="hk.ust.cse.pishon.esgen.commands.LoadChange">
       </handler>
       <handler
-            class="hk.ust.cse.pishon.esgen.handlers.LoadScriptStatHandler"
-            commandId="hk.ust.cse.pishon.esgen.commands.LoadScriptStat">
+            class="hk.ust.cse.pishon.esgen.handlers.LoadMultiObjFilesHandler"
+            commandId="hk.ust.cse.pishon.esgen.commands.LoadMultiObjFiles">
       </handler>
       <handler
             class="hk.ust.cse.pishon.esgen.handlers.CopyHandler"
@@ -597,8 +612,8 @@
             commandId="hk.ust.cse.pishon.esgen.commands.DeleteScript">
       </handler>
       <handler
-            class="hk.ust.cse.pishon.esgen.handlers.ExportAllHandler"
-            commandId="hk.ust.cse.pishon.esgen.commands.ExportAll">
+            class="hk.ust.cse.pishon.esgen.handlers.ExportScriptDataHandler"
+            commandId="hk.ust.cse.pishon.esgen.commands.ExportScriptData">
       </handler>
       <handler
             class="hk.ust.cse.pishon.esgen.handlers.LoadScriptHandler"
@@ -612,6 +627,14 @@
             class="hk.ust.cse.pishon.esgen.handlers.CombineScriptsHandler"
             commandId="hk.ust.cse.pishon.esgen.commands.CombineScripts">
       </handler>
+       <handler
+             class="hk.ust.cse.pishon.esgen.handlers.LoadScriptDataHandler"
+             commandId="hk.ust.cse.pishon.esgen.commands.LoadScriptData">
+       </handler>
+       <handler
+             class="hk.ust.cse.pishon.esgen.handlers.LoadWebScriptHandler"
+             commandId="hk.ust.cse.pishon.esgen.commands.LoadWebScript">
+       </handler>
    </extension>
    <extension
          point="org.eclipse.ui.services">

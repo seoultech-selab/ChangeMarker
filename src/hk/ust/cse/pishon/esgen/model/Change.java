@@ -19,6 +19,14 @@ public class Change implements Serializable {
 		this.newFile = new CompareItem(newFilePath);
 		this.script = new EditScript();
 	}
+	
+	public Change(String name, CompareItem oldFile, CompareItem newFile) {
+		super();
+		this.name = name;
+		this.oldFile = oldFile;
+		this.newFile = newFile;
+		this.script = new EditScript();
+	}
 
 	public String getName() {
 		return name;
@@ -55,5 +63,9 @@ public class Change implements Serializable {
 	
 	public void setScript(EditScript script) {
 		this.script = script;
+	}
+	
+	public Change copyWithoutScript() {
+		return new Change(name, oldFile.copy(), newFile.copy());
 	}
 }

@@ -19,9 +19,8 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import hk.ust.cse.pishon.esgen.model.ScriptItem;
 import hk.ust.cse.pishon.esgen.views.ChangeView;
 import hk.ust.cse.pishon.esgen.views.ScriptList;
-import hk.ust.cse.pishon.esgen.views.ScriptStatView;
 
-public class LoadScriptStatHandler extends AbstractHandler {
+public class LoadWebScriptHandler extends AbstractHandler {
 
 	private static final String ERROR_DIALOG_TITLE = "Load Error";
 
@@ -31,32 +30,26 @@ public class LoadScriptStatHandler extends AbstractHandler {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 		IWorkbenchPage page = window.getActivePage();
 		ScriptList scriptList = (ScriptList)page.findView(ScriptList.ID);
+		ChangeView changeView = (ChangeView)page.findView(ChangeView.ID);
 		try {
 			if(scriptList == null) {
 				page.showView(ScriptList.ID);
 				scriptList = (ScriptList)page.findView(ScriptList.ID);
 			}
 			FileDialog dialog = new FileDialog(shell, SWT.MULTI);
-			dialog.setText("Select Edit Scripts - *.obj files.");
+			dialog.setText("Select a *.obj file for scripts.");
 			dialog.setFilterExtensions(new String[] {"*.obj"});
-			dialog.open();
-			String[] names = dialog.getFileNames();
-			String filterPath = dialog.getFilterPath();
-			if(names == null || names.length == 0){
-				MessageDialog.openError(shell, ERROR_DIALOG_TITLE, "No files are selected.");
+			String name = dialog.open();
+			if(name == null){
+				MessageDialog.openError(shell, ERROR_DIALOG_TITLE, "No file is selected.");
 			}else{
-				List<ScriptItem> items = new ArrayList<>();
-				for(String name : names)
-					items.add(new ScriptItem(filterPath + File.separator + name));
-				scriptList.setInput(items);
-				ScriptStatView statView = (ScriptStatView)page.findView(ScriptStatView.ID);
-				if(statView != null)
-					statView.setInput();
-				ChangeView changeView = (ChangeView)page.findView(ChangeView.ID);
-				if(changeView != null) {
-					changeView.setScripts(items);
+				File f = new File(name);
+				if(f.exists()){
+					((ChangeView)changeView).setWebScripts(f);
+				}else{
+					MessageDialog.openError(shell, ERROR_DIALOG_TITLE, "It is not a valid script file.");
 				}
-			}
+			}			
 		} catch (PartInitException e) {
 			e.printStackTrace();
 			MessageDialog.openError(shell, ERROR_DIALOG_TITLE, "Error occurred while script loading.");

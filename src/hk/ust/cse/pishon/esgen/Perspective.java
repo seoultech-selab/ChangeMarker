@@ -15,7 +15,6 @@ public class Perspective implements IPerspectiveFactory {
 		listFolder.addView("hk.ust.cse.pishon.esgen.views.scriptlist");
 		IFolderLayout scriptFolder = layout.createFolder("ScriptFolder", 
 				IPageLayout.BOTTOM, IPageLayout.RATIO_MAX, IPageLayout.ID_EDITOR_AREA);
-		scriptFolder.addView("hk.ust.cse.pishon.esgen.views.scriptstatview");
 		scriptFolder.addView("hk.ust.cse.pishon.esgen.views.multiscriptview");
 	}
 

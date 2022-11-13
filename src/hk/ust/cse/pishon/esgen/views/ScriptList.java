@@ -66,31 +66,7 @@ public class ScriptList extends ViewPart {
 		viewer.setContentProvider(ArrayContentProvider.getInstance());
 		viewer.setLabelProvider(new ViewLabelProvider());
 		// Provide the input to the ContentProvider
-		scripts = new ArrayList<ScriptItem>();
-		//Disable opening loaded scripts for now.
-		/*
-		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
-			public void doubleClick(DoubleClickEvent event) {
-				IStructuredSelection selection = (IStructuredSelection)event.getSelection();
-				if(selection.getFirstElement() instanceof ScriptItem){
-					ScriptItem item = (ScriptItem)selection.getFirstElement();
-					IViewPart changeView = page.findView(ChangeView.ID);
-					if(changeView != null){
-						((ChangeView)changeView).updateInput(item.changes);
-					}
-					ScriptView scriptView = (ScriptView)page.findView(ScriptView.ID);
-					if(scriptView != null) {
-						String changeName = scriptView.getChangeName();
-						if(item.changes.containsKey(changeName)) {
-							scriptView.setInput(changeName, item.changes.get(changeName).getScript());
-						}
-					}
-					opened = item;
-					setInput();
-				}
-			}
-		}); */
+		scripts = new ArrayList<ScriptItem>();		
 		page.addPartListener(new IPartListener2(){
 		});
 	}
@@ -113,8 +89,10 @@ public class ScriptList extends ViewPart {
 
 	public void setInput(List<ScriptItem> newInput){
 		scripts.clear();
-		scripts.addAll(newInput);
-		viewer.setInput(scripts);
+		if(newInput != null) {			
+			scripts.addAll(newInput);
+			viewer.setInput(scripts);
+		}		
 	}
 
 	public List<ScriptItem> getInput(){

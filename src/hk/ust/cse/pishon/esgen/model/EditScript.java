@@ -12,6 +12,10 @@ public class EditScript implements Serializable {
 	public EditScript(){
 		editOps = new ArrayList<EditOp>();
 	}
+	
+	public EditScript(List<EditOp> ops){
+		editOps = new ArrayList<EditOp>(ops);
+	}
 
 	public void add(EditOp op){
 		this.editOps.add(op);

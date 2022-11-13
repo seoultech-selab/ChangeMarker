@@ -53,6 +53,7 @@ public class ScriptItem implements Serializable {
 		super();
 		this.fileName = fileName;
 		this.filePath = filePath;
+		this.changes = new TreeMap<String, Change>();
 		if(changes != null)
 			changes.forEach(c -> this.changes.put(c.getName(), c));
 	}

@@ -21,6 +21,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -32,10 +33,12 @@ import hk.ust.cse.pishon.esgen.compare.CompareInput;
 import hk.ust.cse.pishon.esgen.model.Change;
 import hk.ust.cse.pishon.esgen.model.EditOp;
 import hk.ust.cse.pishon.esgen.model.Node;
+import hk.ust.cse.pishon.esgen.model.ScriptGroup;
 
 public class MultiScriptView extends ViewPart {
 
 	public static final String ID = "hk.ust.cse.pishon.esgen.views.multiscriptview";
+	public static final String GROUP_PREFIX = "group";
 
 	private TreeViewer viewer;
 	private String changeName;
@@ -84,19 +87,25 @@ public class MultiScriptView extends ViewPart {
 		viewer.getTree().setFont(resourceManager.createFont(FontDescriptor.createFrom("Courier", 12, SWT.NORMAL)));
 
 		TreeViewerColumn colName = new TreeViewerColumn(viewer, SWT.LEFT);
-		colName.getColumn().setWidth(80);
+		colName.getColumn().setWidth(120);
 		colName.getColumn().setText("Name");
 		colName.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
+				String name = "";
 				if(element instanceof Node) {
-					Node n = (Node)element;
-					if(n.value instanceof String)
-						return n ==  curr ? n.value + " - current" : (String)n.value;
+					Node n = (Node)element;					
+					if(n.value instanceof String) {
+						name = (String)n.value;
+					} else if(n.value instanceof ScriptGroup) {
+						name = ((ScriptGroup)n.value).toString();						
+					}
+					if(n == curr)
+						name = name + " - current";
 				}
-				return "";
-			}
-		});
+				return name;
+			}			
+		});		
 
 		TreeViewerColumn colType = new TreeViewerColumn(viewer, SWT.LEFT);
 		colType.getColumn().setWidth(50);
@@ -321,6 +330,12 @@ public class MultiScriptView extends ViewPart {
 		getViewSite().getPage().addPartListener(listener);
 	}
 
+	@Override
+	public void saveState(IMemento memento) {
+		super.saveState(memento);
+		//		MessageDialog.open(MessageDialog.CONFIRM, null, null, "Changed Status", SWT.NONE);
+	}
+
 	protected void setCurrent(Node n) {
 		if(scripts == null) {
 			scripts = new Node(changeName);
@@ -418,25 +433,28 @@ public class MultiScriptView extends ViewPart {
 	}
 
 	public void combineScripts() {
-		Map<List<EditOp>, String> combined = new HashMap<>();
+		Map<List<EditOp>, ScriptGroup> combined = new HashMap<>();
 		for(Node n : scripts.children) {
 			List<EditOp> editOps = new ArrayList<>();
 			for(Node c : n.children) {
 				editOps.add((EditOp)c.value);
 			}
 			editOps.sort((op1, op2) -> EditOp.compare(op1, op2));
-			String scriptName = (String)n.value;
-			combined.compute(editOps, (k,v) -> v == null ? scriptName : String.join(",", v, scriptName));
+			String scriptName = n.value instanceof String ? (String)n.value : ((ScriptGroup)n.value).getName();
+			combined.putIfAbsent(editOps, new ScriptGroup(GROUP_PREFIX+String.format("%02d", combined.size()+1)));
+			combined.get(editOps).addScript(scriptName);			
 		}
 		Node newScripts = new Node(changeName);
-		combined.forEach((list, name) -> {
-			Node n = new Node(name);
+		combined.forEach((list, group) -> {
+			Node n = new Node(group);
 			for(EditOp op : list)
 				n.addChild(new Node(op));
 			newScripts.addChild(n);
 		});
 		newScripts.children.sort((Node n1, Node n2) ->
-		((String)n1.value).compareTo((String)n2.value));
+			n1.value instanceof ScriptGroup ? 
+					((ScriptGroup)n1.value).getName().compareTo(((ScriptGroup)n2.value).getName()) : 
+						((String)n1.value).compareTo((String)n2.value));
 		scripts = newScripts;
 		curr = scripts.children.get(0);
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
