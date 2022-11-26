@@ -94,18 +94,18 @@ public class MultiScriptView extends ViewPart {
 			public String getText(Object element) {
 				String name = "";
 				if(element instanceof Node) {
-					Node n = (Node)element;					
+					Node n = (Node)element;
 					if(n.value instanceof String) {
 						name = (String)n.value;
 					} else if(n.value instanceof ScriptGroup) {
-						name = ((ScriptGroup)n.value).toString();						
+						name = ((ScriptGroup)n.value).toString();
 					}
 					if(n == curr)
 						name = name + " - current";
 				}
 				return name;
-			}			
-		});		
+			}
+		});
 
 		TreeViewerColumn colType = new TreeViewerColumn(viewer, SWT.LEFT);
 		colType.getColumn().setWidth(50);
@@ -265,7 +265,7 @@ public class MultiScriptView extends ViewPart {
 				IStructuredSelection selection = (IStructuredSelection)event.getSelection();
 				if(selection.getFirstElement() instanceof Node){
 					Node n = (Node)selection.getFirstElement();
-					if(n.value instanceof String) {
+					if(n.value instanceof String || n.value instanceof ScriptGroup) {
 						MultiScriptView multiScriptViewer = (MultiScriptView)page.findView(MultiScriptView.ID);
 						if(multiScriptViewer != null)
 							multiScriptViewer.setCurrent(n);
@@ -440,9 +440,9 @@ public class MultiScriptView extends ViewPart {
 				editOps.add((EditOp)c.value);
 			}
 			editOps.sort((op1, op2) -> EditOp.compare(op1, op2));
-			String scriptName = n.value instanceof String ? (String)n.value : ((ScriptGroup)n.value).getName();
+			String scriptName = n.value instanceof String ? (String)n.value : ((ScriptGroup)n.value).getAllNames();
 			combined.putIfAbsent(editOps, new ScriptGroup(GROUP_PREFIX+String.format("%02d", combined.size()+1)));
-			combined.get(editOps).addScript(scriptName);			
+			combined.get(editOps).addScript(scriptName);
 		}
 		Node newScripts = new Node(changeName);
 		combined.forEach((list, group) -> {
@@ -452,9 +452,9 @@ public class MultiScriptView extends ViewPart {
 			newScripts.addChild(n);
 		});
 		newScripts.children.sort((Node n1, Node n2) ->
-			n1.value instanceof ScriptGroup ? 
-					((ScriptGroup)n1.value).getName().compareTo(((ScriptGroup)n2.value).getName()) : 
-						((String)n1.value).compareTo((String)n2.value));
+		n1.value instanceof ScriptGroup ?
+				((ScriptGroup)n1.value).getName().compareTo(((ScriptGroup)n2.value).getName()) :
+					((String)n1.value).compareTo((String)n2.value));
 		scripts = newScripts;
 		curr = scripts.children.get(0);
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
