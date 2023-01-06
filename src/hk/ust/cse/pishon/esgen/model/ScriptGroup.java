@@ -19,6 +19,10 @@ public class ScriptGroup implements Serializable {
 	public void addScript(String scriptName) {
 		scriptNames.add(scriptName);
 	}
+	
+	public void addScriptAll(List<String> scriptNameList) {
+		scriptNames.addAll(scriptNameList);
+	}
 
 	public String getName() {
 		return groupName;
