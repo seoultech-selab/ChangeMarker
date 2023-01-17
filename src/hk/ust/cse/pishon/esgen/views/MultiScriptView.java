@@ -1,6 +1,7 @@
 package hk.ust.cse.pishon.esgen.views;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,7 @@ public class MultiScriptView extends ViewPart {
 	private Node scripts = null;
 	private Node curr;
 	private IPartListener2 listener;
-
+	
 	@Override
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
@@ -434,15 +435,23 @@ public class MultiScriptView extends ViewPart {
 
 	public void combineScripts() {
 		Map<List<EditOp>, ScriptGroup> combined = new HashMap<>();
-		for(Node n : scripts.children) {
+		for(Node n : scripts.children) { 
 			List<EditOp> editOps = new ArrayList<>();
 			for(Node c : n.children) {
-				editOps.add((EditOp)c.value);
+				editOps.add((EditOp)c.value);	
 			}
 			editOps.sort((op1, op2) -> EditOp.compare(op1, op2));
-			String scriptName = n.value instanceof String ? (String)n.value : ((ScriptGroup)n.value).getAllNames();
-			combined.putIfAbsent(editOps, new ScriptGroup(GROUP_PREFIX+String.format("%02d", combined.size()+1)));
-			combined.get(editOps).addScript(scriptName);
+			
+			List<String> scriptNameList = new ArrayList<>();
+			if (n.value instanceof String) {
+				scriptNameList.add((String)n.value);
+			} else {
+				String [] arr = ((ScriptGroup)n.value).getAllNames().trim().split(",");
+				scriptNameList = new ArrayList<>(Arrays.asList(arr));
+			}
+
+			combined.putIfAbsent(editOps, new ScriptGroup(GROUP_PREFIX + String.format("%02d", combined.size()+1)));
+			combined.get(editOps).addScriptAll(scriptNameList);
 		}
 		Node newScripts = new Node(changeName);
 		combined.forEach((list, group) -> {

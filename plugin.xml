@@ -152,7 +152,7 @@
                      value="hk.ust.cse.pishon.esgen.views.scriptview">
                </parameter>
             </command>
-            <command
+           <!--  <command
                   commandId="hk.ust.cse.pishon.esgen.commands.ShowScriptStatView"
                   label="Show Script Statistics"
                   style="push">
@@ -160,7 +160,7 @@
                      name="hk.ust.cse.pishon.esgen.views.showView.viewId"
                      value="hk.ust.cse.pishon.esgen.views.scriptlist">
                </parameter>
-            </command>
+            </command> -->
             <command
                   commandId="hk.ust.cse.pishon.esgen.commands.ShowScriptList"
                   label="Show Script List"
