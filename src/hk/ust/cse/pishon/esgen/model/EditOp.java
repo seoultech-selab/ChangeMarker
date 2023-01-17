@@ -191,6 +191,10 @@ public class EditOp implements Serializable, Comparable<EditOp> {
 		int line2 = op2.getType().equals(EditOp.OP_INSERT) ? op2.getNewStartLine() : op2.getOldStartLine();
 		int cmp = Integer.compare(line1, line2);
 		if(cmp == 0) {
+			// if type is different
+			if (!op1.getType().equals(op2.getType())) {
+				return (op1.getType()).compareTo(op2.getType());
+			}
 			int pos1 = op1.getType().equals(EditOp.OP_INSERT) ? op1.getNewStartPos() : op1.getOldStartPos();
 			int pos2 = op2.getType().equals(EditOp.OP_INSERT) ? op2.getNewStartPos() : op2.getOldStartPos();
 			cmp = Integer.compare(pos1, pos2);
